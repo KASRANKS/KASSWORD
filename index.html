@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>KASSWORD</title>
+<meta name="description" content="Kassword — Your encrypted password vault on the Kaspa BlockDAG. No servers. No subscriptions. You own your data."/>
+<meta http-equiv="Referrer-Policy" content="no-referrer"/>
+<meta http-equiv="Permissions-Policy" content="accelerometer=(), autoplay=(), camera=(), display-capture=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), midi=(), payment=(), usb=(), xr-spatial-tracking=()"/>
+<meta http-equiv="X-Content-Type-Options" content="nosniff"/>
+<meta name="color-scheme" content="dark"/>
+<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" crossorigin/>
+<script>try{if(window.top!==window.self){window.top.location=window.self.location;}}catch(e){window.location=window.self.location;}</script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#020b11;--bg2:#061118;--bg3:#0a1820;--bg4:#0f1f2a;
+  --kas:#49eacb;--kas2:#6dfce0;--kdim:rgba(73,234,203,.06);--kglow:rgba(73,234,203,.15);--kmid:rgba(73,234,203,.35);
+  --gold:#f0c040;--purple:#c084fc;
+  --red:#ff4d6a;--rdim:rgba(255,77,106,.06);
+  --amb:#ffb84d;--adim:rgba(255,184,77,.06);
+  --pearl:#e6f5ef;--txt:#e6f5ef;--t2:rgba(230,245,239,.58);--t3:rgba(230,245,239,.32);--t4:rgba(230,245,239,.15);
+  --bdr:rgba(73,234,203,.08);--bdr2:rgba(73,234,203,.15);
+  --syne:'Syne',sans-serif;--dm:'Outfit',sans-serif;--geo:'JetBrains Mono',monospace
+}
+html{background:var(--bg);color:var(--pearl);font-family:var(--dm);scroll-behavior:smooth;-webkit-font-smoothing:antialiased}
+body{min-height:100vh;overflow-x:hidden}
+::selection{background:var(--kas);color:var(--bg)}
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.022;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.7' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+nav{position:fixed;top:0;width:100%;z-index:200;padding:0 32px;height:60px;display:flex;align-items:center;
+  background:rgba(5,8,16,.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--bdr)}
+.nav-inner{max-width:1100px;width:100%;margin:0 auto;display:flex;align-items:center;justify-content:space-between}
+.logo{font-family:var(--syne);font-weight:800;font-size:18px;color:var(--pearl);letter-spacing:4px;text-transform:uppercase;display:flex;align-items:center;gap:12px;text-decoration:none}
+.logo span{color:var(--kas)}
+.net-badge{font-family:var(--geo);font-size:11px;padding:6px 16px;border-radius:20px;letter-spacing:.5px;transition:.3s}
+.net-badge.off{color:var(--t3);border:1px solid var(--t4)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.net-badge.on{color:var(--kas);border:1px solid var(--kmid);background:var(--kdim)}
+.net-badge.err{color:var(--red);border:1px solid rgba(255,77,106,.3);background:var(--rdim)}
+section{position:relative;z-index:1;padding:80px 32px 60px}
+.container{max-width:900px;margin:0 auto}
+.section-label{font-family:var(--geo);font-size:12px;color:var(--kas);letter-spacing:5px;text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.section-label::before{content:'';width:20px;height:1px;background:var(--kas)}
+.section-title{font-family:var(--syne);font-size:clamp(32px,5vw,48px);font-weight:800;color:var(--pearl);line-height:.95;letter-spacing:-2px;margin-bottom:18px}
+.section-title em{font-style:normal;color:var(--kas)}
+
+/* LOCK SCREEN */
+#lock-screen{position:fixed;inset:0;z-index:300;background:var(--bg);display:flex;align-items:center;justify-content:safe center;flex-direction:column;gap:10px;overflow-y:auto;overflow-x:hidden;padding:64px 32px 48px}
+#lock-screen>canvas{position:absolute;inset:0;z-index:0;pointer-events:none}
+#lock-screen>*:not(canvas){position:relative;z-index:1}
+#lock-screen::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 50% 40%,rgba(73,234,203,.06) 0%,rgba(73,234,203,.02) 30%,transparent 70%);pointer-events:none}
+#lock-screen::after{content:'';position:fixed;inset:0;opacity:.03;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.7' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+#lock-screen.hidden{display:none}
+.lock-icon{font-size:48px;margin-bottom:4px;filter:drop-shadow(0 0 30px rgba(73,234,203,.3))}
+.lock-title{font-family:var(--syne);font-size:clamp(3.5rem,8vw,7rem);font-weight:800;color:var(--pearl);letter-spacing:-4px;text-align:center;line-height:.88;filter:drop-shadow(0 0 60px rgba(73,234,203,.2))}
+.lock-title em{font-style:normal;background:linear-gradient(135deg,#49eacb 0%,#a8f8e8 30%,#49eacb 60%,#6dfce0 100%);background-size:200% 200%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:lock-shimmer 4s ease-in-out infinite}
+@keyframes lock-shimmer{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+.lock-sub{font-family:var(--dm);font-size:clamp(1rem,2vw,1.2rem);color:var(--t2);text-align:center;max-width:500px;line-height:1.7;font-weight:300}
+.lock-input{width:min(380px,90vw);padding:16px 20px;background:var(--bg2);border:1px solid var(--bdr2);border-radius:0;font-family:var(--geo);font-size:16px;color:var(--kas);outline:none;text-align:center;letter-spacing:2px;clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,8px 100%,0 calc(100% - 8px))}
+.lock-input::placeholder{color:var(--t4);letter-spacing:1px}
+.lock-btn{padding:16px 56px;font-family:var(--geo);font-size:.72rem;font-weight:600;letter-spacing:3px;text-transform:uppercase;background:var(--kas);color:var(--bg);border:none;cursor:pointer;clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,8px 100%,0 calc(100% - 8px));transition:all .25s;position:relative;overflow:hidden}
+.lock-btn:hover{box-shadow:0 0 80px rgba(73,234,203,.7),0 0 160px rgba(73,234,203,.25);transform:translateY(-3px)}
+.lock-err{font-family:var(--geo);font-size:13px;color:var(--red);min-height:20px}
+.strength-bar{width:min(380px,90vw);height:4px;background:var(--bg3);margin-top:10px;overflow:hidden}
+.strength-fill{height:100%;width:0;transition:width .3s,background .3s}
+.strength-text{font-family:var(--geo);font-size:11px;margin-top:6px;min-height:16px;transition:color .3s}
+.lock-hint{font-family:var(--geo);font-size:12px;color:var(--t3);text-align:center;max-width:360px;line-height:1.6}
+#lock-setup{display:none}
+
+/* VAULT */
+.vault-grid{display:grid;grid-template-columns:280px 1fr;gap:32px;margin-top:32px}
+.sidebar{display:flex;flex-direction:column;gap:8px}
+.cat-btn{padding:14px 20px;font-family:var(--geo);font-size:13px;color:var(--t2);background:transparent;border:1px solid var(--bdr);cursor:pointer;transition:.2s;text-align:left;display:flex;align-items:center;gap:10px}
+.cat-btn:hover{border-color:var(--kas);color:var(--kas)}
+.cat-btn.on{background:var(--kdim);border-color:var(--kas);color:var(--kas)}
+.cat-btn .count{margin-left:auto;font-size:11px;color:var(--t3)}
+.add-btn{padding:14px 20px;font-family:var(--syne);font-size:14px;font-weight:700;color:var(--bg);background:var(--kas);border:none;cursor:pointer;clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,8px 100%,0 calc(100% - 8px));transition:.3s;margin-top:8px}
+.add-btn:hover{box-shadow:0 0 40px rgba(73,234,203,.3)}
+
+.entries{display:flex;flex-direction:column;gap:12px}
+.entry-card{padding:20px;background:var(--bg2);border:1px solid var(--bdr);cursor:pointer;transition:.2s;clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px))}
+.entry-card:hover{border-color:rgba(73,234,203,.2);transform:translateY(-2px)}
+.entry-card .e-type{font-family:var(--geo);font-size:11px;color:var(--kas);text-transform:uppercase;letter-spacing:2px;margin-bottom:6px}
+.entry-card .e-name{font-family:var(--syne);font-size:16px;font-weight:700;color:var(--pearl)}
+.entry-card .e-user{font-family:var(--geo);font-size:13px;color:var(--t3);margin-top:4px}
+.entry-card .e-date{font-family:var(--geo);font-size:11px;color:var(--t4);margin-top:8px}
+.empty-state{padding:60px 20px;text-align:center;color:var(--t3);font-size:15px;line-height:1.7}
+
+/* MODAL */
+.modal-bg{position:fixed;inset:0;z-index:400;background:rgba(2,11,17,.85);backdrop-filter:blur(12px);display:none;align-items:center;justify-content:center}
+.modal-bg.show{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--bdr2);width:90%;max-width:520px;max-height:85vh;overflow-y:auto;padding:32px;clip-path:polygon(0 0,calc(100% - 14px) 0,100% 14px,100% 100%,14px 100%,0 calc(100% - 14px))}
+.modal h3{font-family:var(--syne);font-size:20px;font-weight:700;color:var(--pearl);margin-bottom:20px}
+.field{margin-bottom:16px}
+.field label{font-family:var(--geo);font-size:12px;color:var(--t2);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:6px}
+.field input,.field textarea,.field select{width:100%;padding:12px 16px;background:var(--bg);border:1px solid var(--bdr);font-family:var(--geo);font-size:14px;color:var(--kas);outline:none}
+.field input:focus,.field textarea:focus{border-color:var(--kas)}
+.field textarea{min-height:100px;resize:vertical}
+.field select{cursor:pointer}
+.field select option{background:var(--bg2);color:var(--pearl)}
+.modal-acts{display:flex;gap:10px;margin-top:20px}
+.modal-acts button{flex:1;padding:14px;font-family:var(--syne);font-size:14px;font-weight:700;border:none;cursor:pointer;transition:.2s}
+.m-save{background:var(--kas);color:var(--bg);clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,8px 100%,0 calc(100% - 8px))}
+.m-save:hover{box-shadow:0 0 40px rgba(73,234,203,.3)}
+.m-cancel{background:transparent;color:var(--t2);border:1px solid var(--bdr) !important}
+.m-cancel:hover{border-color:var(--pearl) !important;color:var(--pearl)}
+.m-delete{background:transparent;color:var(--red);border:1px solid rgba(255,77,106,.2) !important;font-size:12px !important;padding:10px !important}
+.m-delete:hover{background:var(--rdim)}
+
+/* VIEW MODAL */
+.view-row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+.view-row:last-child{border:none}
+.view-row .vk{font-family:var(--geo);font-size:12px;color:var(--t3);text-transform:uppercase;letter-spacing:1px}
+.view-row .vv{font-family:var(--geo);font-size:14px;color:var(--kas);word-break:break-all;max-width:60%;text-align:right;cursor:pointer}
+.vv-hidden{filter:blur(5px);transition:.2s}.vv-hidden:hover{filter:blur(0)}
+.copy-btn{font-family:var(--geo);font-size:11px;padding:6px 14px;background:var(--bg3);border:1px solid var(--bdr);color:var(--t2);cursor:pointer;margin-left:8px;transition:.2s}
+.copy-btn:hover{color:var(--kas);border-color:var(--kas)}
+
+/* WALLET BAR */
+.wallet-bar{padding:16px 20px;background:var(--bg2);border:1px solid var(--bdr);margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.wallet-bar .w-addr{font-family:var(--geo);font-size:12px;color:var(--kas);word-break:break-all}
+.wallet-bar .w-bal{font-family:var(--geo);font-size:13px;color:var(--t2)}
+.wallet-bar .w-btns{display:flex;gap:6px}
+.wallet-bar .w-btns button{font-family:var(--geo);font-size:11px;padding:8px 14px;border:1px solid var(--bdr);background:var(--bg3);color:var(--t2);cursor:pointer;transition:.2s}
+.wallet-bar .w-btns button:hover{border-color:var(--kas);color:var(--kas)}
+
+/* STATUS BAR */
+.status-bar{padding:10px 16px;background:var(--kdim);border:1px solid rgba(73,234,203,.12);font-family:var(--geo);font-size:12px;color:var(--kas);margin-bottom:16px;display:none}
+.status-bar.show{display:block}
+
+/* CHAIN SYNC */
+.sync-info{font-family:var(--geo);font-size:12px;color:var(--t3);text-align:center;padding:12px;margin-top:16px}
+
+#log{margin-top:14px;padding:12px;background:var(--bg2);border:1px solid var(--bdr);border-radius:10px;font-family:var(--geo);font-size:12px;color:var(--t3);max-height:140px;overflow-y:auto;display:none}
+
+canvas#bgc{position:fixed;inset:0;z-index:0;pointer-events:none}
+#cur{position:fixed;width:8px;height:8px;background:var(--kas);border-radius:50%;pointer-events:none;z-index:9999;mix-blend-mode:screen;transform:translate(-50%,-50%);transition:transform .08s}
+#cur-r{position:fixed;width:32px;height:32px;border:1.5px solid rgba(73,234,203,.35);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:width .2s,height .2s,border-color .2s}
+@media(pointer:coarse){#cur,#cur-r{display:none}}
+.rv{opacity:0;transform:translateY(28px);transition:all .8s cubic-bezier(.16,1,.3,1)}.rv.vis{opacity:1;transform:translateY(0)}
+@media(max-width:700px){#lock-screen{padding:80px 20px 40px}.lock-title{letter-spacing:-2px}.vault-grid{grid-template-columns:1fr}.sidebar{flex-direction:row;flex-wrap:wrap}.cat-btn{flex:1;min-width:120px}section{padding:70px 16px 40px}.wallet-bar{flex-direction:column;align-items:stretch}.wallet-bar .w-btns{width:100%}.wallet-bar .w-btns button{flex:1;min-width:0;padding:8px 6px;font-size:10px}}
+
+/* === v12 UX additions === */
+#search-bar{width:100%;padding:10px 14px;background:var(--bg);border:1px solid var(--bdr);color:var(--pearl);font-family:var(--geo);font-size:12px;outline:none;transition:.2s;margin-bottom:16px;display:none}
+#search-bar:focus{border-color:var(--kas)}
+#search-bar::placeholder{color:var(--t4)}
+.toast-box{position:fixed;top:70px;right:20px;z-index:500;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+.toast{padding:12px 20px;background:var(--bg2);border:1px solid var(--kmid);font-family:var(--geo);font-size:12px;color:var(--kas);animation:toast-in .3s ease-out;pointer-events:auto;max-width:360px}
+.toast.err{border-color:rgba(255,77,106,.4);color:var(--red)}
+@keyframes toast-in{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:translateX(0)}}
+.rec-key-wrap{position:relative;display:inline-flex;align-items:center;width:320px;margin-bottom:8px}
+.rec-key-wrap input{width:100%;padding-right:44px}
+.rec-toggle{position:absolute;right:6px;font-size:14px;padding:4px 8px;background:transparent;border:1px solid var(--bdr);color:var(--t3);cursor:pointer;transition:.2s;z-index:1}
+.rec-toggle:hover{border-color:var(--kas);color:var(--kas)}
+.lock-ticker{overflow:hidden;border-top:1px solid var(--bdr);border-bottom:1px solid var(--bdr);padding:12px 0;width:calc(100% + 40px);margin-left:-20px;position:relative}
+.lock-ticker .ticker{display:flex;gap:56px;animation:ltscroll 25s linear infinite;width:max-content}
+.lock-ticker .ticker span{font-family:var(--geo);font-size:12px;color:var(--t3);white-space:nowrap;display:flex;align-items:center;gap:8px}
+.lock-ticker .ticker span::after{content:'◆';color:var(--kas);opacity:.3;font-size:6px}
+@keyframes ltscroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+
+/* HERO STATS */
+.lock-stats{display:flex;justify-content:center;gap:0;flex-wrap:wrap;margin:2px 0 4px}
+.lock-stat{text-align:center;padding:10px 22px;border-left:1px solid rgba(73,234,203,.15)}
+.lock-stat:first-child{border-left:none;padding-left:0}
+.lock-stat-val{font-family:var(--syne);font-size:clamp(18px,2.2vw,26px);font-weight:800;color:var(--kas);text-shadow:0 0 30px rgba(73,234,203,.4);line-height:1;letter-spacing:-1px;margin-bottom:3px}
+.lock-stat-label{font-family:var(--geo);font-size:9px;letter-spacing:2.5px;text-transform:uppercase;color:var(--t3)}
+
+/* Nav tagline */
+.nav-tagline{font-family:var(--geo);font-size:10px;color:var(--t4);letter-spacing:2px;text-transform:uppercase;display:none}
+@media(min-width:600px){.nav-tagline{display:block}}
+
+/* Lock info box compact */
+.lock-info-box{max-width:480px;margin-top:4px;padding:18px 22px;background:rgba(6,17,24,.9);border:1px solid rgba(73,234,203,.07);clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px))}
+.lock-info-box .lbx-title{font-family:var(--syne);font-size:13px;font-weight:700;color:var(--pearl);margin-bottom:10px;letter-spacing:.5px}
+.lock-info-box .lbx-row{font-family:var(--geo);font-size:11px;color:var(--t2);line-height:1.7;margin-bottom:6px;display:flex;gap:8px;align-items:flex-start}
+.lock-info-box .lbx-row:last-child{margin-bottom:0}
+.lock-info-box .lbx-row strong{color:var(--kas);white-space:nowrap}
+</style>
+</head>
+<body>
+<noscript><div style="position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:24px;background:#020b11;color:#e6f5ef;font-family:system-ui,sans-serif;text-align:center">KASSWORD requires JavaScript to run securely in your browser.</div></noscript>
+<canvas id="bgc"></canvas>
+<div id="cur"></div><div id="cur-r"></div>
+<div class="toast-box" id="toast-box"></div>
+
+<!-- LOCK SCREEN -->
+<div id="lock-screen">
+  <canvas id="bgc-lock"></canvas>
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
+    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="width:36px;height:36px;fill:var(--kas);filter:drop-shadow(0 0 20px rgba(73,234,203,.6))"><polygon points="15.3 18.9 15.3 18.9 12.7 18.5 13.4 13.4 8 17.6 6.4 15.6 11.2 11.9 6.4 8.2 8 6.2 13.4 10.4 12.7 5.3 15.3 4.9 16.3 11.9 15.3 18.9"/></svg>
+  </div>
+  <div style="font-family:var(--geo);font-size:11px;color:var(--kas);letter-spacing:5px;text-transform:uppercase;margin-bottom:4px">Encrypted · BlockDAG · Zero Trust</div>
+  <div class="lock-title">Kas<em>Sword</em></div>
+  <div class="lock-sub">Your passwords live on the Kaspa BlockDAG. AES-256 encrypted in your browser. No servers. No accounts. No subscriptions.</div>
+  <div class="lock-stats">
+    <div class="lock-stat"><div class="lock-stat-val">256</div><div class="lock-stat-label">AES bits</div></div>
+    <div class="lock-stat"><div class="lock-stat-val">1M</div><div class="lock-stat-label">PBKDF2 rounds</div></div>
+    <div class="lock-stat"><div class="lock-stat-val">2×</div><div class="lock-stat-label">Factor key</div></div>
+    <div class="lock-stat"><div class="lock-stat-val">0</div><div class="lock-stat-label">Servers</div></div>
+  </div>
+  <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:8px">
+    <div style="padding:8px 14px;background:var(--kdim);border:1px solid rgba(73,234,203,.1);font-family:var(--geo);font-size:11px;color:var(--kas);clip-path:polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,6px 100%,0 calc(100% - 6px))">AES-256-GCM</div>
+    <div style="padding:8px 14px;background:var(--kdim);border:1px solid rgba(73,234,203,.1);font-family:var(--geo);font-size:11px;color:var(--kas);clip-path:polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,6px 100%,0 calc(100% - 6px))">PBKDF2 1M</div>
+    <div style="padding:8px 14px;background:var(--kdim);border:1px solid rgba(73,234,203,.1);font-family:var(--geo);font-size:11px;color:var(--kas);clip-path:polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,6px 100%,0 calc(100% - 6px))">2-Factor Key</div>
+    <div style="padding:8px 14px;background:var(--kdim);border:1px solid rgba(73,234,203,.1);font-family:var(--geo);font-size:11px;color:var(--kas);clip-path:polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,6px 100%,0 calc(100% - 6px))">Zero Servers</div>
+  </div>
+  <div class="lock-ticker"><div class="ticker">
+    <span>AES-256-GCM</span><span>PBKDF2 1M</span><span>2-Factor Encryption</span><span>Kaspa BlockDAG</span><span>Zero Servers</span><span>Client-side Only</span><span>Open Source</span><span>Stealth Payloads</span><span>Auto-lock</span><span>No Cloud</span>
+    <span>AES-256-GCM</span><span>PBKDF2 1M</span><span>2-Factor Encryption</span><span>Kaspa BlockDAG</span><span>Zero Servers</span><span>Client-side Only</span><span>Open Source</span><span>Stealth Payloads</span><span>Auto-lock</span><span>No Cloud</span>
+  </div></div>
+  <div id="lock-login">
+    <input type="password" class="lock-input" id="mp-input" placeholder="Master password" autocomplete="current-password" autocapitalize="none" autocorrect="off" spellcheck="false" oninput="checkStrength(this.value)" onkeydown="if(event.key==='Enter')unlock()"/>
+    <div class="strength-bar"><div class="strength-fill" id="str-fill"></div></div>
+    <div class="strength-text" id="str-text"></div>
+    <input type="password" class="lock-input" id="mp-confirm" placeholder="Confirm password" autocomplete="new-password" autocapitalize="none" autocorrect="off" spellcheck="false" style="display:none;margin-top:10px" onkeydown="if(event.key==='Enter')unlock()"/>
+    <div style="margin-top:12px"><button class="lock-btn" onclick="unlock()">Unlock</button></div>
+    <div class="lock-err" id="lock-err"></div>
+    <div class="lock-hint" id="lock-hint" style="margin-top:16px">First time? Enter a new master password (8+ characters). It encrypts everything. Lose it, lose access. There is no recovery.</div>
+    <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap;justify-content:center">
+      <button style="font-family:var(--geo);font-size:11px;padding:8px 16px;background:transparent;border:1px solid rgba(73,234,203,.15);color:var(--kas);cursor:pointer;opacity:.7;transition:.2s" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='.7'" onclick="showRecover()">Recover from DAG backup</button>
+      <button style="font-family:var(--geo);font-size:11px;padding:8px 16px;background:transparent;border:1px solid rgba(255,77,106,.15);color:var(--red);cursor:pointer;opacity:.5;transition:.2s" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='.5'" onclick="resetVault()">Clear browser data</button>
+    </div>
+    <!-- RECOVER PANEL -->
+    <div id="recover-panel" style="display:none;margin-top:20px;width:320px">
+      <div style="font-family:var(--syne);font-size:14px;font-weight:700;color:var(--pearl);margin-bottom:12px">Recover from DAG</div>
+      <div style="font-family:var(--geo);font-size:11px;color:var(--t2);line-height:1.6;margin-bottom:12px">Enter your vault key (64-char hex from your previous browser) and your master password. We'll fetch your encrypted backup from the DAG and decrypt it.</div>
+      <div class="rec-key-wrap">
+        <input type="password" class="lock-input" id="rec-key" placeholder="Vault key (64 hex characters)" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" inputmode="text" style="font-size:12px;letter-spacing:0"/>
+        <button class="rec-toggle" id="rec-toggle" onclick="toggleRecKey()">👁</button>
+      </div>
+      <input type="password" class="lock-input" id="rec-pass" placeholder="Master password" autocomplete="current-password" autocapitalize="none" autocorrect="off" spellcheck="false" style="margin-bottom:8px"/>
+      <button class="lock-btn" onclick="recoverFromDag()" style="width:100%">Recover</button>
+      <div class="lock-err" id="rec-err" style="margin-top:8px"></div>
+      <button style="font-family:var(--geo);font-size:11px;padding:6px 12px;background:transparent;border:none;color:var(--t3);cursor:pointer;margin-top:8px" onclick="document.getElementById('recover-panel').style.display='none'">Cancel</button>
+      <div id="rec-log" style="display:none;margin-top:12px;padding:10px;background:var(--bg);border:1px solid var(--bdr);max-height:200px;overflow-y:auto;font-family:var(--geo);font-size:11px;color:var(--t3);line-height:1.6;word-break:break-all"></div>
+    </div>
+  </div>
+  <div class="lock-info-box">
+    <div class="lbx-title">How your data is protected</div>
+    <div class="lbx-row">🔐 <span><strong>AES-256-GCM</strong> encryption. Same standard used by governments. Every entry is encrypted before touching any storage.</span></div>
+    <div class="lbx-row">🔑 <span><strong>2-factor encryption.</strong> Both your password AND wallet key are required. PBKDF2 with 1,000,000 iterations kills brute force.</span></div>
+    <div class="lbx-row">🎲 <span><strong>Random salt + random IV</strong> per vault. Two users with the same password produce completely different ciphertext.</span></div>
+    <div class="lbx-row">💻 <span><strong>Everything runs in your browser.</strong> No servers. No cloud. Your password never leaves your device.</span></div>
+    <div class="lbx-row">⛓ <span><strong>Kaspa DAG backup.</strong> Optional. Encrypted vault stored as a transaction payload — unreadable without both keys.</span></div>
+    <div class="lbx-row">⏱ <span><strong>Auto-lock</strong> after 5 minutes of inactivity. Password wiped from memory.</span></div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<nav><div class="nav-inner">
+  <a class="logo" href="#"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="width:22px;height:22px;fill:var(--kas);filter:drop-shadow(0 0 14px rgba(73,234,203,.9));animation:pulse 2.5s ease-in-out infinite"><polygon points="15.3 18.9 15.3 18.9 12.7 18.5 13.4 13.4 8 17.6 6.4 15.6 11.2 11.9 6.4 8.2 8 6.2 13.4 10.4 12.7 5.3 15.3 4.9 16.3 11.9 15.3 18.9"/></svg>KASS<span>WORD</span></a>
+  <div style="display:flex;align-items:center;gap:16px">
+    <span class="nav-tagline">by KasRanks</span>
+    <div class="net-badge off" id="status">OFFLINE</div>
+  </div>
+</div></nav>
+
+<section id="vault-app" style="padding-top:100px">
+  <div class="container">
+    <div class="wallet-bar" id="wallet-bar" style="display:none">
+      <div><div class="w-addr" id="w-addr">—</div><div class="w-bal" id="w-bal">—</div></div>
+      <div class="w-btns">
+        <button onclick="copyAddr(this)">Copy address</button>
+        <button onclick="refreshBalance()">Refresh</button>
+        <button onclick="backupToChain()">Backup to DAG</button>
+        <button onclick="exportBackup()">Export backup</button>
+        <button onclick="showWalletKey()">Show vault key</button>
+      </div>
+      <div id="wk-display" style="display:none;width:100%;margin-top:10px;padding:12px;background:var(--bg);border:1px solid rgba(255,77,106,.2)">
+        <div style="font-family:var(--geo);font-size:11px;color:var(--red);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Recovery key. Save this AND your password.</div>
+        <div id="wk-val" style="font-family:var(--geo);font-size:12px;color:var(--amb);word-break:break-all;filter:blur(4px);cursor:pointer;transition:.2s" onmouseover="this.style.filter='blur(0)'" onmouseout="this.style.filter='blur(4px)'">loading...</div>
+        <div style="display:flex;gap:6px;margin-top:8px">
+          <button style="font-family:var(--geo);font-size:11px;padding:6px 14px;border:1px solid var(--bdr);background:var(--bg3);color:var(--t2);cursor:pointer" onclick="copyKey(this)">Copy key</button>
+          <button style="font-family:var(--geo);font-size:11px;padding:6px 14px;border:1px solid var(--bdr);background:var(--bg3);color:var(--t2);cursor:pointer" onclick="document.getElementById('wk-display').style.display='none'">Hide</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="status-bar" id="status-bar"></div>
+    <div id="log"></div>
+    <div style="margin-bottom:24px;padding-bottom:24px;border-bottom:1px solid var(--bdr)">
+    <div class="section-label">Your passwords</div>
+    <div class="section-title">Encrypted <em>entries</em></div>
+    <div style="font-size:14px;color:var(--t2);line-height:1.7;max-width:600px">Passwords, seed phrases, and documents. Encrypted locally with AES-256. Backed up to the Kaspa DAG on your command.</div>
+    </div>
+    <input type="text" id="search-bar" placeholder="🔍  Search entries by name, username, or URL..." autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false"/>
+    <div class="vault-grid">
+      <div class="sidebar">
+        <button class="cat-btn on" onclick="filterCat('all',this)">🔐 All<span class="count" id="cnt-all">0</span></button>
+        <button class="cat-btn" onclick="filterCat('password',this)">🔑 Passwords<span class="count" id="cnt-password">0</span></button>
+        <button class="cat-btn" onclick="filterCat('note',this)">📝 Secure notes<span class="count" id="cnt-note">0</span></button>
+        <button class="cat-btn" onclick="filterCat('seed',this)">🌱 Recovery records<span class="count" id="cnt-seed">0</span></button>
+        <button class="cat-btn" onclick="filterCat('id',this)">🪪 Identity docs<span class="count" id="cnt-id">0</span></button>
+        <button class="add-btn" onclick="openAdd()">+ Add entry</button>
+      </div>
+      <div class="entries" id="entries">
+        <div class="empty-state">No entries yet. Add your first.</div>
+      </div>
+    </div>
+    
+    <div style="margin-top:48px;padding:32px;background:var(--bg2);border:1px solid var(--bdr);clip-path:polygon(0 0,calc(100% - 14px) 0,100% 14px,100% 100%,14px 100%,0 calc(100% - 14px))">
+      <div style="font-family:var(--syne);font-size:20px;font-weight:800;color:var(--pearl);margin-bottom:20px">How to use <em style="color:var(--kas)">Kassword</em></div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px">
+        <div style="padding:16px;background:var(--bg);border:1px solid var(--bdr)">
+          <div style="font-family:var(--syne);font-size:32px;font-weight:800;color:var(--bg4);margin-bottom:8px">01</div>
+          <div style="font-family:var(--syne);font-size:14px;font-weight:700;color:var(--pearl);margin-bottom:6px">Set your master password</div>
+          <div style="font-family:var(--geo);font-size:12px;color:var(--t2);line-height:1.6">Choose 8+ characters. This encrypts everything. There is no reset, no recovery without it.</div>
+        </div>
+        <div style="padding:16px;background:var(--bg);border:1px solid var(--bdr)">
+          <div style="font-family:var(--syne);font-size:32px;font-weight:800;color:var(--bg4);margin-bottom:8px">02</div>
+          <div style="font-family:var(--syne);font-size:14px;font-weight:700;color:var(--pearl);margin-bottom:6px">Save your vault key</div>
+          <div style="font-family:var(--geo);font-size:12px;color:var(--t2);line-height:1.6">Click "Show vault key" and save the 64-character hex somewhere safe. You need this AND your password to recover on another device.</div>
+        </div>
+        <div style="padding:16px;background:var(--bg);border:1px solid var(--bdr)">
+          <div style="font-family:var(--syne);font-size:32px;font-weight:800;color:var(--bg4);margin-bottom:8px">03</div>
+          <div style="font-family:var(--syne);font-size:14px;font-weight:700;color:var(--pearl);margin-bottom:6px">Add your secrets</div>
+          <div style="font-family:var(--geo);font-size:12px;color:var(--t2);line-height:1.6">Passwords, Recovery records, IDs, secure notes. Everything is AES-256 encrypted before touching any storage.</div>
+        </div>
+        <div style="padding:16px;background:var(--bg);border:1px solid var(--bdr)">
+          <div style="font-family:var(--syne);font-size:32px;font-weight:800;color:var(--bg4);margin-bottom:8px">04</div>
+          <div style="font-family:var(--syne);font-size:14px;font-weight:700;color:var(--pearl);margin-bottom:6px">Fund your wallet</div>
+          <div style="font-family:var(--geo);font-size:12px;color:var(--t2);line-height:1.6">Send at least 5 KAS to your vault address. This covers the DAG backup fee.</div>
+        </div>
+        <div style="padding:16px;background:var(--bg);border:1px solid var(--bdr)">
+          <div style="font-family:var(--syne);font-size:32px;font-weight:800;color:var(--bg4);margin-bottom:8px">05</div>
+          <div style="font-family:var(--syne);font-size:14px;font-weight:700;color:var(--pearl);margin-bottom:6px">Backup to DAG</div>
+          <div style="font-family:var(--geo);font-size:12px;color:var(--t2);line-height:1.6">Click "Backup to DAG". Your encrypted vault is stored as a transaction payload. Indestructible. Recoverable from any device.</div>
+        </div>
+        <div style="padding:16px;background:var(--bg);border:1px solid var(--bdr)">
+          <div style="font-family:var(--syne);font-size:32px;font-weight:800;color:var(--bg4);margin-bottom:8px">06</div>
+          <div style="font-family:var(--syne);font-size:14px;font-weight:700;color:var(--pearl);margin-bottom:6px">Recover anywhere</div>
+          <div style="font-family:var(--geo);font-size:12px;color:var(--t2);line-height:1.6">New device? Click "Recover from DAG backup", enter your vault key + password. Your secrets come back from the chain.</div>
+        </div>
+      </div>
+      <div style="margin-top:16px;padding:12px 16px;background:var(--bg);border-left:3px solid var(--amb);font-family:var(--geo);font-size:12px;color:var(--amb);line-height:1.6">Your data lives in browser storage. Clearing cookies or using private/incognito mode will erase local data. Always back up to the DAG before clearing browser data.</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ADD/EDIT MODAL -->
+<div class="modal-bg" id="modal-add">
+  <div class="modal">
+    <h3 id="modal-title">Add entry</h3>
+    <div class="field"><label>Type</label>
+      <select id="f-type" onchange="toggleFields()">
+        <option value="password">Password</option>
+        <option value="note">Secure note</option>
+        <option value="seed">Recovery records</option>
+        <option value="id">Identity document</option>
+      </select>
+    </div>
+    <div class="field"><label>Name</label><input id="f-name" placeholder="e.g. Gmail, Bank, Metamask backup" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false"/></div>
+    <div class="field f-pw"><label>Username / Email</label><input id="f-user" placeholder="user@example.com" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false"/></div>
+    <div class="field f-pw"><label>Password</label><input id="f-pass" type="password" placeholder="••••••••" autocomplete="new-password" autocapitalize="none" autocorrect="off" spellcheck="false"/></div>
+    <div class="field f-pw"><label>Website</label><input id="f-url" placeholder="https://..." autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" inputmode="url"/></div>
+    <div class="field f-note" style="display:none"><label>Content</label><textarea id="f-content" placeholder="Your secure note or recovery records..." autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false"></textarea></div>
+    <div class="field f-id" style="display:none"><label>Document type</label><input id="f-doctype" placeholder="e.g. Passport, Driver License" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false"/></div>
+    <div class="field f-id" style="display:none"><label>Document number</label><input id="f-docnum" placeholder="AB1234567" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false"/></div>
+    <div class="field f-id" style="display:none"><label>Expiry</label><input id="f-docexp" type="date"/></div>
+    <div class="field"><label>Notes (optional)</label><textarea id="f-notes" placeholder="Any extra info..." autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" style="min-height:60px"></textarea></div>
+    <div class="modal-acts">
+      <button class="m-cancel" onclick="closeModal('modal-add')">Cancel</button>
+      <button class="m-save" onclick="saveEntry()">Encrypt & Save</button>
+    </div>
+    <div style="margin-top:12px"><button class="m-delete" id="btn-delete" style="display:none" onclick="deleteEntry()">Delete this entry</button></div>
+  </div>
+</div>
+
+<!-- VIEW MODAL -->
+<div class="modal-bg" id="modal-view">
+  <div class="modal">
+    <h3 id="view-title">Entry</h3>
+    <div id="view-body"></div>
+    <div class="modal-acts" style="margin-top:20px">
+      <button class="m-cancel" onclick="closeModal('modal-view')">Close</button>
+      <button class="m-save" onclick="editFromView()">Edit</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import * as kaspa from './kaspa/kaspa.js';
+const $=id=>document.getElementById(id);
+const LOG=$('log');
+function log(msg){console.log('[KW]',msg);LOG.style.display='block';var d=document.createElement('div');d.textContent=new Date().toLocaleTimeString()+' · '+msg;LOG.appendChild(d);LOG.scrollTop=LOG.scrollHeight;}
+
+/* ═══ CRYPTO: AES-256-GCM ═══ */
+async function deriveKey(password,salt){
+  const enc=new TextEncoder();
+  const saltBytes=(typeof salt==='string')?enc.encode(salt):salt;
+  /* 2-FACTOR: mix wallet private key into password before derivation.
+     Even "00000000" becomes uncrackable because attacker also needs 
+     the 64-char random wallet key. Password alone is not enough. */
+  const walletKey=localStorage.getItem('kassword_pk')||'';
+  const combined=password+'::'+walletKey;
+  const keyMaterial=await crypto.subtle.importKey('raw',enc.encode(combined),{name:'PBKDF2'},false,['deriveBits','deriveKey']);
+  return crypto.subtle.deriveKey({name:'PBKDF2',salt:saltBytes,iterations:1000000,hash:'SHA-256'},keyMaterial,{name:'AES-GCM',length:256},false,['encrypt','decrypt']);
+}
+function getOrCreateSalt(){
+  let s=localStorage.getItem('kassword_salt');
+  if(!s){const b=crypto.getRandomValues(new Uint8Array(32));s=Array.from(b).map(x=>x.toString(16).padStart(2,'0')).join('');localStorage.setItem('kassword_salt',s);}
+  return new Uint8Array(s.match(/.{2}/g).map(x=>parseInt(x,16)));
+}
+async function encrypt(text,password){
+  const iv=crypto.getRandomValues(new Uint8Array(12));
+  const key=await deriveKey(password,getOrCreateSalt());
+  const enc=new TextEncoder();
+  const ct=await crypto.subtle.encrypt({name:'AES-GCM',iv},key,enc.encode(text));
+  const buf=new Uint8Array(iv.length+ct.byteLength);
+  buf.set(iv);buf.set(new Uint8Array(ct),iv.length);
+  return Array.from(buf).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+async function decrypt(hex,password){
+  const bytes=new Uint8Array(hex.match(/.{2}/g).map(b=>parseInt(b,16)));
+  const iv=bytes.slice(0,12);
+  const ct=bytes.slice(12);
+  const key=await deriveKey(password,getOrCreateSalt());
+  const dec=await crypto.subtle.decrypt({name:'AES-GCM',iv},key,ct);
+  return new TextDecoder().decode(dec);
+}
+
+/* ═══ VAULT STATE ═══ */
+let masterPass=null;
+let vault=[];/* [{id,type,name,user,pass,url,content,doctype,docnum,docexp,notes,created,modified}] */
+let currentFilter='all';
+let editingId=null;
+let viewingId=null;
+/* Auto-lock after 5 minutes of inactivity */
+let lockTimer=null;
+let unlockAttempts=0;let unlockCooldown=false;
+function resetLockTimer(){clearTimeout(lockTimer);lockTimer=setTimeout(()=>{if(masterPass){masterPass=null;vault=[];for(const k in cpData)delete cpData[k];$('lock-screen').classList.remove('hidden');$('mp-input').value='';$('mp-confirm').value='';$('mp-confirm').style.display='none';$('lock-hint').textContent='Vault locked due to inactivity. Enter your master password.';log('Auto-locked (5 min inactivity)');}},5*60*1000);}
+document.addEventListener('mousemove',resetLockTimer);
+document.addEventListener('keydown',resetLockTimer);
+document.addEventListener('click',resetLockTimer);
+let rpc=null,privateKey=null,address=null;
+
+/* ═══ FEE MODEL — 5 KAS per backup ═══ */
+/* 2 KAS → maker wallet, 3 KAS → miners (priority fee) */
+const BACKUP_FEE_MAKER=200000000n; /* 2 KAS */
+const BACKUP_FEE_MINERS=300000000n; /* 3 KAS */
+const MAKER_ADDR='kaspa:qru9y27vkh9g9326sfn3gt085t36fplnnlxdq30xug3vnnpujjt2g0xx4zmg6';
+
+/* ═══ LOCK/UNLOCK ═══ */
+window.checkStrength=function(pw){
+  const fill=$('str-fill'),txt=$('str-text');
+  if(!pw){fill.style.width='0';txt.textContent='';return;}
+  let score=0;
+  if(pw.length>=8)score++;
+  if(pw.length>=12)score++;
+  if(pw.length>=16)score++;
+  if(/[a-z]/.test(pw)&&/[A-Z]/.test(pw))score++;
+  if(/[0-9]/.test(pw))score++;
+  if(/[^a-zA-Z0-9]/.test(pw))score++;
+  /* Penalize common patterns */
+  if(/^(.)\1+$/.test(pw))score=0; /* all same char like 00000000 */
+  if(/^(012|123|234|345|456|567|678|789|abc|qwe|pas)/i.test(pw))score=Math.max(0,score-2);
+  const levels=[
+    {w:'16%',c:'#ff4d6a',t:'Very weak. Your vault key adds protection, but please use a stronger password.'},
+    {w:'33%',c:'#ff8c42',t:'Weak. Consider adding more length or special characters.'},
+    {w:'50%',c:'#ffb84d',t:'Fair. Getting better.'},
+    {w:'75%',c:'#49eacb',t:'Strong.'},
+    {w:'100%',c:'#49eacb',t:'Very strong. Excellent.'}
+  ];
+  const lvl=Math.min(score,4);
+  fill.style.width=levels[lvl].w;
+  fill.style.background=levels[lvl].c;
+  txt.textContent=levels[lvl].t;
+  txt.style.color=levels[lvl].c;
+};
+
+window.showRecover=function(){
+  $('recover-panel').style.display='block';
+  $('rec-err').textContent='';
+};
+
+window.recoverFromDag=async function(){
+  const key=$('rec-key').value.trim();
+  const pw=$('rec-pass').value;
+  if(!key||key.length!==64||!/^[0-9a-fA-F]+$/.test(key)){$('rec-err').textContent='Vault key must be 64 hex characters';return;}
+  if(!pw||pw.length<8){$('rec-err').textContent='Password must be at least 8 characters';return;}
+  $('rec-err').textContent='Connecting to network...';
+  $('rec-err').style.color='var(--kas)';
+  try{
+    /* Derive address from the provided key */
+    const pk=new kaspa.PrivateKey(key);
+    const addr=pk.toKeypair().toAddress('mainnet').toString();
+    $('rec-err').textContent='Fetching transactions for '+addr.slice(0,24)+'...';
+    /* Connect to network */
+    let client;
+    try{
+      const resolver=new kaspa.Resolver();
+      client=await Promise.race([resolver.connect('mainnet'),new Promise((_,r)=>setTimeout(()=>r('Timeout'),12000))]);
+    }catch(ce){
+      try{client=new kaspa.RpcClient({url:'ws://127.0.0.1:16110',networkId:'mainnet'});await client.connect();}
+      catch(ce2){$('rec-err').textContent='Cannot connect to network';$('rec-err').style.color='var(--red)';return;}
+    }
+    /* Fetch transactions via REST API */
+    const apiBase='https://api.kaspa.org';
+    $('rec-err').textContent='Searching chain for vault backup...';
+    $('rec-err').style.color='var(--kas)';
+    let found=false;
+    let debugLog='';
+    const rl=$('rec-log');rl.style.display='block';while(rl.firstChild)rl.removeChild(rl.firstChild);
+    function dlog(msg){debugLog+='\n'+msg;console.log('[RECOVER]',msg);var dd=document.createElement('div');dd.textContent=msg;rl.appendChild(dd);rl.scrollTop=rl.scrollHeight;}
+    try{
+      /* Step 1: Get transaction list */
+      const listUrl=apiBase+'/addresses/'+addr+'/full-transactions?limit=50&offset=0&resolve_previous_outpoints=no';
+      dlog('Fetching: '+listUrl);
+      const listResp=await fetch(listUrl);
+      dlog('List response: '+listResp.status);
+      if(!listResp.ok){$('rec-err').textContent='API returned '+listResp.status;$('rec-err').style.color='var(--red)';return;}
+      const txs=await listResp.json();
+      dlog('Got '+txs.length+' transactions');
+      if(!txs.length){$('rec-err').textContent='No transactions found for this address.';$('rec-err').style.color='var(--red)';return;}
+      $('rec-err').textContent='Found '+txs.length+' TX(s). Scanning payloads...';
+      /* Step 2: Check each TX — first try payload from list response */
+      for(let ti=0;ti<txs.length;ti++){
+        const tx=txs[ti];
+        const txId=tx.transaction_id||tx.id||'';
+        dlog('TX['+ti+']: id='+txId.slice(0,16)+'...');
+        /* Try all possible payload field locations */
+        let rawPayload=tx.payload||tx.Payload||'';
+        if(!rawPayload&&tx.transaction){rawPayload=tx.transaction.payload||tx.transaction.Payload||'';}
+        if(!rawPayload&&tx.verbose_data){rawPayload=tx.verbose_data.payload||'';}
+        dlog('  payload from list: '+(rawPayload?rawPayload.slice(0,40)+'... ('+rawPayload.length+' chars)':'EMPTY'));
+        /* If no payload in list, fetch individual TX */
+        if(!rawPayload&&txId){
+          try{
+            const txUrl=apiBase+'/transactions/'+txId;
+            dlog('  Fetching individual: '+txUrl);
+            const txResp=await fetch(txUrl);
+            if(txResp.ok){
+              const txData=await txResp.json();
+              rawPayload=txData.payload||txData.Payload||'';
+              if(!rawPayload&&txData.transaction){rawPayload=txData.transaction.payload||'';}
+              if(!rawPayload&&txData.verbose_data){rawPayload=txData.verbose_data.payload||'';}
+              dlog('  payload from individual: '+(rawPayload?rawPayload.slice(0,40)+'... ('+rawPayload.length+' chars)':'EMPTY'));
+              /* Log all top-level keys for debugging */
+              dlog('  TX keys: '+Object.keys(txData).join(', '));
+              if(txData.transaction)dlog('  TX.transaction keys: '+Object.keys(txData.transaction).join(', '));
+            }else{dlog('  individual fetch failed: '+txResp.status);}
+          }catch(te){dlog('  individual fetch error: '+String(te));}
+        }
+        if(!rawPayload)continue;
+        /* Try to decode payload */
+        try{
+          const payloadText=hexToString(rawPayload);
+          dlog('  decoded: '+payloadText.slice(0,80)+'...');
+          let parsed;
+          try{parsed=JSON.parse(payloadText);}catch(pe){dlog('  not JSON');continue;}
+          dlog('  parsed.t='+parsed.t+' parsed.v='+parsed.v+' has d='+(!!parsed.d)+' has s='+(!!parsed.s));
+          if(parsed.t==='kw-1'&&parsed.d){
+            $('rec-err').textContent='Found vault backup (v'+parsed.v+')! Decrypting...';
+            $('rec-err').style.color='var(--kas)';
+            localStorage.setItem('kassword_pk',key);
+            if(parsed.s){
+              localStorage.setItem('kassword_salt',parsed.s);
+              dlog('  salt restored from payload');
+            }else{dlog('  NO salt in payload (v1)');}
+            try{
+              const decrypted=await decrypt(parsed.d,pw);
+              const entries=JSON.parse(decrypted);
+              vault=entries;masterPass=pw;
+              if(!parsed.s)getOrCreateSalt();
+              saveVaultLocal();
+              $('lock-screen').classList.add('hidden');
+              privateKey=pk;address=pk.toKeypair().toAddress('mainnet');
+              $('w-addr').textContent=address.toString();
+              $('wallet-bar').style.display='flex';
+              rpc=client;$('status').textContent='MAINNET LIVE';$('status').className='net-badge on';
+              renderVault();await refreshBalance();
+              log('Vault recovered from DAG! '+vault.length+' entries');
+              showStatus('Vault recovered.');found=true;break;
+            }catch(de){
+              dlog('  DECRYPTION FAILED: '+String(de));
+              $('rec-err').textContent='Found backup but decryption failed. Wrong password or salt mismatch.';
+              $('rec-err').style.color='var(--red)';
+              localStorage.removeItem('kassword_pk');localStorage.removeItem('kassword_salt');
+              found=false;break;
+            }
+          }
+        }catch(pe){dlog('  payload decode error: '+String(pe));continue;}
+      }
+    }catch(fe){
+      dlog('FETCH ERROR: '+String(fe));
+      $('rec-err').textContent='API error: '+String(fe);$('rec-err').style.color='var(--red)';return;
+    }
+    if(!found&&$('rec-err').style.color!=='var(--red)'){
+      $('rec-err').textContent='No vault backup found. Check browser console (F12) for debug log.';
+      $('rec-err').style.color='var(--red)';
+      localStorage.removeItem('kassword_pk');
+    }
+    console.log('=== FULL RECOVERY DEBUG LOG ==='+debugLog);
+  }catch(e){
+    $('rec-err').textContent='Error: '+String(e);
+    $('rec-err').style.color='var(--red)';
+  }
+};
+
+function hexToString(hex){
+  const bytes=new Uint8Array(hex.match(/.{2}/g).map(b=>parseInt(b,16)));
+  return new TextDecoder().decode(bytes);
+}
+
+window.resetVault=function(){
+  if(!confirm('This will clear your vault from THIS BROWSER only. If you backed up to the DAG, that backup still exists. Are you sure?'))return;
+  if(!confirm('LAST CHANCE. Your local vault data will be erased. You can still recover from DAG backup if you have your vault key + password.'))return;
+  localStorage.removeItem('kassword_data');
+  localStorage.removeItem('kassword_salt');
+  localStorage.removeItem('kassword_pk');
+  location.reload();
+};
+
+window.unlock=async function(){
+  if(unlockCooldown){$('lock-err').textContent='Too many attempts. Wait 30 seconds.';return;}
+  const pw=$('mp-input').value;
+  if(!pw||pw.length<8){$('lock-err').textContent='Minimum 8 characters. Use 12+ for best security.';return;}
+  if(/^(.)\1+$/.test(pw)){$('lock-err').textContent='All same character is extremely weak. Your vault key helps but please choose better.';return;}
+  const saved=localStorage.getItem('kassword_data');
+  if(saved){
+    /* Existing vault — decrypt */
+    try{const json=await decrypt(saved,pw);vault=JSON.parse(json);masterPass=pw;$('mp-input').value='';$('mp-confirm').value='';$('lock-screen').classList.add('hidden');renderVault();log('Vault unlocked: '+vault.length+' entries');resetLockTimer();}
+    catch(e){
+      unlockAttempts++;
+      if(unlockAttempts>=5){
+        unlockCooldown=true;
+        $('lock-err').textContent='Too many wrong attempts. Locked for 30 seconds.';
+        setTimeout(()=>{unlockCooldown=false;unlockAttempts=0;$('lock-err').textContent='';},30000);
+      }else{
+        $('lock-err').textContent='Wrong password ('+unlockAttempts+'/5 attempts)';
+      }
+    }
+  }else{
+    /* New vault — require confirmation */
+    const conf=$('mp-confirm');
+    if(conf.style.display==='none'){
+      conf.style.display='block';
+      $('lock-hint').textContent='Confirm your master password. This cannot be recovered. Ever.';
+      $('lock-err').textContent='';
+      conf.focus();
+      return;
+    }
+    if(pw!==$('mp-confirm').value){$('lock-err').textContent='Passwords do not match';return;}
+    masterPass=pw;
+    $('mp-input').value='';$('mp-confirm').value='';
+    saveVaultLocal();
+    $('lock-screen').classList.add('hidden');
+    renderVault();
+    log('New vault created');resetLockTimer();
+    log('IMPORTANT: Your encryption uses your wallet key + password.');
+    log('If you clear cookies, you need BOTH your password AND wallet key to recover.');
+    showStatus('Vault created. Back up your wallet key — you need it AND your password to recover.');
+  }
+};
+
+function saveVaultLocal(){
+  if(!masterPass)return;
+  encrypt(JSON.stringify(vault),masterPass).then(enc=>{
+    localStorage.setItem('kassword_data',enc);
+    log('Vault saved locally ('+vault.length+' entries)');
+  });
+}
+
+/* ═══ RENDER ═══ */
+function renderVault(){
+  const filtered=currentFilter==='all'?vault:vault.filter(e=>e.type===currentFilter);
+  const el=$('entries');
+  if(!filtered.length){el.innerHTML='<div class="empty-state">No entries'+(currentFilter!=='all'?' in this category':'') +'. Add your first.</div>';updateCounts();return;}
+  el.innerHTML=filtered.map(e=>`
+    <div class="entry-card" onclick="viewEntry('${esc(e.id)}')">
+      <div class="e-type">${typeIcon(e.type)} ${e.type}</div>
+      <div class="e-name">${esc(e.name)}</div>
+      ${e.user?'<div class="e-user">'+esc(e.user)+'</div>':''}
+      <div class="e-date">Added ${new Date(e.created).toLocaleDateString()}</div>
+    </div>
+  `).join('');
+  updateCounts();
+}
+function typeIcon(t){return{password:'🔑',note:'📝',seed:'🌱',id:'🪪'}[t]||'🔐';}
+function updateCounts(){
+  $('cnt-all').textContent=vault.length;
+  ['password','note','seed','id'].forEach(t=>{
+    $('cnt-'+t).textContent=vault.filter(e=>e.type===t).length;
+  });
+}
+function esc(s){return String(s||'').replace(/[<>&"']/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;'}[c]));}
+
+/* ═══ FILTER ═══ */
+window.filterCat=function(cat,btn){
+  currentFilter=cat;
+  document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  renderVault();
+};
+
+/* ═══ ADD/EDIT ═══ */
+window.openAdd=function(){
+  editingId=null;
+  $('modal-title').textContent='Add entry';
+  $('f-type').value='password';$('f-name').value='';$('f-user').value='';$('f-pass').value='';$('f-url').value='';$('f-content').value='';$('f-doctype').value='';$('f-docnum').value='';$('f-docexp').value='';$('f-notes').value='';
+  $('btn-delete').style.display='none';
+  toggleFields();
+  $('modal-add').classList.add('show');
+};
+window.toggleFields=function(){
+  const t=$('f-type').value;
+  document.querySelectorAll('.f-pw').forEach(el=>el.style.display=t==='password'?'block':'none');
+  document.querySelectorAll('.f-note').forEach(el=>el.style.display=(t==='note'||t==='seed')?'block':'none');
+  document.querySelectorAll('.f-id').forEach(el=>el.style.display=t==='id'?'block':'none');
+};
+window.saveEntry=function(){
+  const type=$('f-type').value;
+  const name=$('f-name').value.trim();
+  if(!name){alert('Name is required');return;}
+  const entry={
+    id:editingId||crypto.randomUUID(),
+    type,name,
+    user:$('f-user').value.trim(),
+    pass:$('f-pass').value,
+    url:$('f-url').value.trim(),
+    content:$('f-content').value,
+    doctype:$('f-doctype').value.trim(),
+    docnum:$('f-docnum').value.trim(),
+    docexp:$('f-docexp').value,
+    notes:$('f-notes').value,
+    created:editingId?vault.find(e=>e.id===editingId)?.created:Date.now(),
+    modified:Date.now()
+  };
+  if(editingId){vault=vault.map(e=>e.id===editingId?entry:e);}
+  else{vault.push(entry);}
+  saveVaultLocal();
+  closeModal('modal-add');
+  renderVault();
+};
+window.deleteEntry=function(){
+  if(!editingId)return;
+  if(!confirm('Delete this entry permanently?'))return;
+  vault=vault.filter(e=>e.id!==editingId);
+  saveVaultLocal();
+  closeModal('modal-add');
+  renderVault();
+};
+window.closeModal=function(id){$(id).classList.remove('show');if(id==='modal-view'){for(const k in cpData)delete cpData[k];}};
+
+/* ═══ VIEW ═══ */
+window.viewEntry=function(id){
+  if(!/^[a-f0-9-]+$/i.test(id))return;
+  const e=vault.find(v=>v.id===id);
+  if(!e)return;
+  viewingId=id;
+  $('view-title').textContent=typeIcon(e.type)+' '+esc(e.name);
+  let html='';
+  if(e.type==='password'){
+    html+=viewRow('Username',e.user,false);
+    html+=viewRow('Password',e.pass,true);
+    if(e.url)html+=viewRow('Website',e.url,false);
+  }else if(e.type==='note'||e.type==='seed'){
+    html+=viewRow('Content',e.content,true);
+  }else if(e.type==='id'){
+    html+=viewRow('Document type',e.doctype,false);
+    html+=viewRow('Number',e.docnum,true);
+    if(e.docexp)html+=viewRow('Expiry',e.docexp,false);
+  }
+  if(e.notes)html+=viewRow('Notes',e.notes,false);
+  html+=viewRow('Created',new Date(e.created).toLocaleString(),false);
+  if(e.modified!==e.created)html+=viewRow('Modified',new Date(e.modified).toLocaleString(),false);
+  $('view-body').innerHTML=html;
+  $('modal-view').classList.add('show');
+};
+function viewRow(label,val,sensitive){
+  const id='cp-'+Math.random().toString(36).slice(2,8);
+  cpData[id]=val;
+  return `<div class="view-row"><span class="vk">${label}</span><span><span class="vv ${sensitive?'vv-hidden':''}">${esc(val)}</span><button class="copy-btn" onclick="navigator.clipboard.writeText(cpData['${id}'])">copy</button></span></div>`;
+}
+const cpData={};
+window.editFromView=function(){
+  closeModal('modal-view');
+  const e=vault.find(v=>v.id===viewingId);
+  if(!e)return;
+  editingId=e.id;
+  $('modal-title').textContent='Edit entry';
+  $('f-type').value=e.type;$('f-name').value=e.name;$('f-user').value=e.user||'';$('f-pass').value=e.pass||'';$('f-url').value=e.url||'';$('f-content').value=e.content||'';$('f-doctype').value=e.doctype||'';$('f-docnum').value=e.docnum||'';$('f-docexp').value=e.docexp||'';$('f-notes').value=e.notes||'';
+  $('btn-delete').style.display='block';
+  toggleFields();
+  $('modal-add').classList.add('show');
+};
+
+/* ═══ WALLET + CHAIN BACKUP ═══ */
+function initWallet(){
+  let saved=localStorage.getItem('kassword_pk');
+  if(!saved){const kb=crypto.getRandomValues(new Uint8Array(32));saved=Array.from(kb).map(b=>b.toString(16).padStart(2,'0')).join('');localStorage.setItem('kassword_pk',saved);log('New wallet generated');}
+  else{log('Wallet loaded');}
+  privateKey=new kaspa.PrivateKey(saved);address=privateKey.toKeypair().toAddress('mainnet');
+  $('w-addr').textContent=address.toString();
+  $('wallet-bar').style.display='flex';
+  log('Wallet: '+address.toString());
+}
+window.showWalletKey=function(){
+  const k=localStorage.getItem('kassword_pk');
+  if(k){$('wk-val').textContent=k;$('wk-display').style.display='block';}
+};
+
+window.refreshBalance=async function(){
+  if(!rpc||!address)return;
+  try{const{entries}=await rpc.getUtxosByAddresses([address.toString()]);let total=0n;for(const e of entries)total+=e.amount;const kas=Number(total)/100000000;$('w-bal').textContent=kas.toFixed(8)+' KAS';}catch(e){$('w-bal').textContent='error';}
+};
+
+window.backupToChain=async function(){
+  if(!rpc){showStatus('Not connected to network');return;}
+  if(!vault.length){showStatus('Vault is empty');return;}
+  showStatus('Encrypting vault for DAG backup...');
+  try{
+    const vaultJson=JSON.stringify(vault);
+    const encrypted=await encrypt(vaultJson,masterPass);
+    /* Include salt in payload so recovery on another browser works */
+    const saltHex=localStorage.getItem('kassword_salt')||'';
+    /* STEALTH PAYLOAD — no protocol name visible */
+    const payload=JSON.stringify({"t":"kw-1","v":2,"d":encrypted,"s":saltHex});
+    const payloadHex=Array.from(new TextEncoder().encode(payload)).map(b=>b.toString(16).padStart(2,'0')).join('');
+    const payloadBytes=payloadHex.length/2;
+    if(payloadBytes>16000){showStatus('Vault too large for single tx ('+payloadBytes+' bytes). Max ~16KB per backup.');return;}
+    const addr=address.toString();
+    const{entries}=await rpc.getUtxosByAddresses([addr]);
+    if(!entries.length){showStatus('No funds. Send at least 5 KAS to your wallet.');return;}
+    let totalBal=0n;for(const u of entries)totalBal+=u.amount;
+    const needed=BACKUP_FEE_MAKER+BACKUP_FEE_MINERS;
+    if(totalBal<needed){showStatus('Need '+Number(needed/100000000n)+' KAS. You have '+Number(totalBal/100000000n)+' KAS.');return;}
+    log('Backup: balance '+(Number(totalBal)/100000000)+' KAS, need '+(Number(needed)/100000000)+' KAS');
+    /* MAINNET: 2 KAS to maker wallet */
+    const makerAddr=MAKER_ADDR;
+    const result=await kaspa.createTransactions({networkId:'mainnet',entries,outputs:[{address:makerAddr,amount:BACKUP_FEE_MAKER}],priorityFee:BACKUP_FEE_MINERS,changeAddress:addr});
+    for(const pending of result.transactions){
+      try{
+        const tx=pending.transaction;tx.payload=payloadHex;
+        kaspa.signTransaction(tx,[privateKey],true);
+        tx.finalize();
+        await rpc.submitTransaction({transaction:tx,allowOrphan:false});
+        log('Vault backed up to DAG! TX: '+tx.id);
+        showStatus('Vault backed up to Kaspa DAG. TX: '+tx.id.slice(0,16)+'...');
+        return;
+      }catch(ea){log('Path A: '+String(ea));}
+      await pending.sign([privateKey]);const txId=await pending.submit(rpc);
+      log('Vault backup (no payload): '+txId);
+      showStatus('Backup sent (no payload fallback)');
+    }
+  }catch(e){log('Backup error: '+String(e));showStatus('Backup failed: '+String(e));}
+};
+
+function showStatus(msg){$('status-bar').textContent=msg;$('status-bar').classList.add('show');setTimeout(()=>$('status-bar').classList.remove('show'),6000);}
+
+try{log('Loading WASM SDK...');await kaspa.default('./kaspa/kaspa_bg.wasm');log('SDK loaded');initWallet();}catch(e){log('SDK: '+String(e));}
+async function connect(){
+  const attempts=[{label:'public mainnet',method:'resolver',net:'mainnet'},{label:'public mainnet retry',method:'resolver',net:'mainnet'},{label:'localhost mainnet',method:'direct',url:'ws://127.0.0.1:16110',net:'mainnet'}];
+  for(const a of attempts){try{log('Connecting...');$('status').textContent='CONNECTING...';$('status').className='net-badge off';
+    let client;if(a.method==='direct'){client=new kaspa.RpcClient({url:a.url,networkId:a.net});await Promise.race([client.connect(),new Promise((_,r)=>setTimeout(()=>r(new Error('Timeout')),5000))]);}else{const resolver=new kaspa.Resolver();client=await Promise.race([resolver.connect(a.net),new Promise((_,r)=>setTimeout(()=>r(new Error('Timeout')),12000))]);}
+    const info=await client.getServerInfo();rpc=client;log('Connected to '+a.net);$('status').textContent=a.net.toUpperCase()+' LIVE';$('status').className='net-badge on';await refreshBalance();return;
+  }catch(e){log(a.label+': '+String(e));}}
+  $('status').textContent='OFFLINE';$('status').className='net-badge err';
+}
+connect();
+</script>
+<script>
+(function(){
+  const c=document.getElementById('bgc');if(!c)return;
+  const ctx=c.getContext('2d');
+  const KAS='rgba(73,234,203,',GOLD='rgba(240,192,64,',BLUE='rgba(100,180,252,';
+  const isMob='ontouchstart' in window;const CONN=210;
+  let W=0,H=0,pts=[];
+  function resize(){W=window.innerWidth;H=window.innerHeight;c.width=W;c.height=H;}
+  class P{constructor(){this.reset();}
+    reset(){this.x=Math.random()*W;this.y=Math.random()*H;this.vx=(Math.random()-.5)*.3;this.vy=(Math.random()-.5)*.3;this.ph=Math.random()*6.28;this.sp=.005+Math.random()*.012;const r=Math.random();if(r<.68){this.col=KAS;this.r=2+Math.random()*1.6;}else if(r<.86){this.col=GOLD;this.r=1.6+Math.random()*1.2;}else{this.col=BLUE;this.r=1.4+Math.random();}}
+    update(){this.x+=this.vx;this.y+=this.vy;this.ph+=this.sp;if(this.x<-70||this.x>W+70||this.y<-70||this.y>H+70)this.reset();}
+    draw(){const a=.38+.3*Math.sin(this.ph);ctx.beginPath();ctx.arc(this.x,this.y,this.r*4,0,6.28);ctx.fillStyle=this.col+(a*.12)+')';ctx.fill();ctx.beginPath();ctx.arc(this.x,this.y,this.r,0,6.28);ctx.fillStyle=this.col+a+')';ctx.fill();}
+  }
+  function mk(){const n=isMob?Math.min(20,Math.floor(W*H/25000)):Math.min(80,Math.floor(W*H/14000));pts=Array.from({length:n},()=>new P());}
+  function conns(){for(let i=0;i<pts.length;i++)for(let j=i+1;j<pts.length;j++){const dx=pts[i].x-pts[j].x,dy=pts[i].y-pts[j].y,d=Math.sqrt(dx*dx+dy*dy);if(d>=CONN)continue;const int=1-d/CONN;ctx.beginPath();ctx.moveTo(pts[i].x,pts[i].y);ctx.lineTo(pts[j].x,pts[j].y);ctx.strokeStyle=KAS+(int*.28)+')';ctx.lineWidth=int*1.6;ctx.stroke();}}
+  function frame(){ctx.clearRect(0,0,W,H);conns();pts.forEach(p=>{p.update();p.draw();});requestAnimationFrame(frame);}
+  resize();mk();window.addEventListener('resize',()=>{resize();mk();});frame();
+})();
+</script>
+<script>
+/* === v12 UX HELPERS — engine untouched === */
+window.toast=function(msg,isErr){
+  var box=document.getElementById('toast-box');
+  var t=document.createElement('div');
+  t.className='toast'+(isErr?' err':'');
+  t.textContent=msg;
+  box.appendChild(t);
+  setTimeout(function(){t.style.opacity='0';t.style.transition='opacity .3s';setTimeout(function(){t.remove();},300);},4000);
+};
+(function(){
+  var sb=document.getElementById('status-bar');
+  new MutationObserver(function(){
+    if(sb.classList.contains('show')&&sb.textContent){
+      var isErr=sb.textContent.toLowerCase().indexOf('fail')>=0||sb.textContent.toLowerCase().indexOf('error')>=0||sb.textContent.toLowerCase().indexOf('no fund')>=0;
+      toast(sb.textContent,isErr);
+    }
+  }).observe(sb,{childList:true,characterData:true,subtree:true});
+})();
+document.getElementById('search-bar').addEventListener('input',function(){
+  var q=this.value.toLowerCase().trim();
+  var cards=document.querySelectorAll('.entry-card');
+  cards.forEach(function(card){
+    var text=card.textContent.toLowerCase();
+    card.style.display=(!q||text.indexOf(q)>=0)?'':'none';
+  });
+});
+window.copyAddr=function(btn){
+  navigator.clipboard.writeText(document.getElementById('w-addr').textContent);
+  var orig=btn.textContent;btn.textContent='Copied!';btn.style.color='var(--kas)';
+  setTimeout(function(){btn.textContent=orig;btn.style.color='';},1500);
+};
+window.copyKey=function(btn){
+  navigator.clipboard.writeText(document.getElementById('wk-val').textContent);
+  var orig=btn.textContent;btn.textContent='Copied!';btn.style.color='var(--kas)';
+  setTimeout(function(){btn.textContent=orig;btn.style.color='';},1500);
+};
+window.toggleRecKey=function(){
+  var inp=document.getElementById('rec-key');
+  var btn=document.getElementById('rec-toggle');
+  if(inp.type==='password'){inp.type='text';btn.textContent='🙈';}
+  else{inp.type='password';btn.textContent='👁';}
+};
+window.exportBackup=function(){
+  var encData=localStorage.getItem('kassword_data');
+  var saltHex=localStorage.getItem('kassword_salt')||'';
+  if(!encData){toast('Vault is empty',true);return;}
+  var payload=JSON.stringify({"t":"kw-1","v":2,"d":encData,"s":saltHex});
+  var blob=new Blob([payload],{type:'application/json'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');
+  a.href=url;a.download='backup-'+new Date().toISOString().slice(0,10)+'.json';
+  document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);
+  toast('Local backup exported');
+};
+document.addEventListener('keydown',function(e){
+  if(e.key==='Escape'){
+    ['modal-add','modal-view'].forEach(function(id){
+      var m=document.getElementById(id);
+      if(m&&m.classList.contains('show'))m.classList.remove('show');
+    });
+  }
+});
+['modal-add','modal-view'].forEach(function(id){
+  var m=document.getElementById(id);
+  if(m)m.addEventListener('click',function(e){if(e.target===m)m.classList.remove('show');});
+});
+/* Canvas z-index: main canvas stays at 0, lock screen has its own */
+(function(){
+  var c=document.getElementById('bgc-lock');if(!c)return;
+  var ls=document.getElementById('lock-screen');
+  var ctx=c.getContext('2d');
+  var KAS='rgba(73,234,203,',GOLD='rgba(240,192,64,',BLUE='rgba(100,180,252,';
+  var CONN=210,W=0,H=0,pts=[],running=true;
+  function resize(){W=ls.offsetWidth;H=ls.offsetHeight;c.width=W;c.height=H;}
+  function mkP(){var r=Math.random();var col=r<.68?KAS:r<.86?GOLD:BLUE;var rad=r<.68?2+Math.random()*1.6:r<.86?1.6+Math.random()*1.2:1.4+Math.random();return{x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.3,vy:(Math.random()-.5)*.3,ph:Math.random()*6.28,sp:.005+Math.random()*.012,col:col,r:rad};}
+  function mk(){var n=Math.min(80,Math.floor(W*H/14000));pts=[];for(var i=0;i<n;i++)pts.push(mkP());}
+  function frame(){if(!running)return;ctx.clearRect(0,0,W,H);
+    for(var i=0;i<pts.length;i++)for(var j=i+1;j<pts.length;j++){var dx=pts[i].x-pts[j].x,dy=pts[i].y-pts[j].y,d=Math.sqrt(dx*dx+dy*dy);if(d>=CONN)continue;var int=1-d/CONN;ctx.beginPath();ctx.moveTo(pts[i].x,pts[i].y);ctx.lineTo(pts[j].x,pts[j].y);ctx.strokeStyle=KAS+(int*.28)+')';ctx.lineWidth=int*1.6;ctx.stroke();}
+    for(var k=0;k<pts.length;k++){var p=pts[k];p.x+=p.vx;p.y+=p.vy;p.ph+=p.sp;if(p.x<-70||p.x>W+70||p.y<-70||p.y>H+70){pts[k]=mkP();}var a=.38+.3*Math.sin(p.ph);ctx.beginPath();ctx.arc(p.x,p.y,p.r*4,0,6.28);ctx.fillStyle=p.col+(a*.12)+')';ctx.fill();ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,6.28);ctx.fillStyle=p.col+a+')';ctx.fill();}
+    requestAnimationFrame(frame);}
+  resize();mk();frame();
+  window.addEventListener('resize',function(){resize();mk();});
+  new MutationObserver(function(){running=!ls.classList.contains('hidden');if(running){resize();mk();}}).observe(ls,{attributes:true,attributeFilter:['class']});
+})();
+/* Custom cursor (KasRanks DNA) */
+(function(){var d=document.getElementById('cur'),r=document.getElementById('cur-r');if(!d||!r||window.innerWidth<768)return;var mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',function(e){mx=e.clientX;my=e.clientY;d.style.left=mx+'px';d.style.top=my+'px';});
+(function loop(){rx+=(mx-rx)*.12;ry+=(my-ry)*.12;r.style.left=rx+'px';r.style.top=ry+'px';requestAnimationFrame(loop)})();
+document.querySelectorAll('a,button,.tab,.cat-btn,.entry-card,.add-btn,.lock-btn,.copy-btn,.m-save,.m-cancel').forEach(function(el){el.addEventListener('mouseenter',function(){r.style.width='48px';r.style.height='48px';r.style.borderColor='rgba(73,234,203,.6)';});el.addEventListener('mouseleave',function(){r.style.width='32px';r.style.height='32px';r.style.borderColor='rgba(73,234,203,.35)';});});
+})();
+/* Scroll reveal */
+var obs=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting)e.target.classList.add('vis')})},{threshold:.12});document.querySelectorAll('.rv').forEach(function(el){obs.observe(el)});
+</script>
+</body>
+</html>
