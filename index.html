@@ -4,7 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>KASSWORD</title>
-<meta name="description" content="Kassword — Your encrypted password vault on the Kaspa BlockDAG. No servers. No subscriptions. You own your data."/>
+<meta name="description" content="Kassword - Your encrypted password vault on the Kaspa BlockDAG. No servers. No subscriptions. You own your data."/>
 <meta http-equiv="Referrer-Policy" content="no-referrer"/>
 <meta http-equiv="Permissions-Policy" content="accelerometer=(), autoplay=(), camera=(), display-capture=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), midi=(), payment=(), usb=(), xr-spatial-tracking=()"/>
 <meta http-equiv="X-Content-Type-Options" content="nosniff"/>
@@ -130,35 +130,45 @@ section{position:relative;z-index:1;padding:80px 32px 60px}
 /* STATUS BAR */
 .status-bar{padding:10px 16px;background:var(--kdim);border:1px solid rgba(73,234,203,.12);font-family:var(--geo);font-size:12px;color:var(--kas);margin-bottom:16px;display:none}
 .status-bar.show{display:block}
+.media-drop{position:relative;border:2px dashed rgba(73,234,203,.2);padding:24px;text-align:center;cursor:pointer;transition:.2s;margin-bottom:12px;display:none}
+.media-drop:hover{border-color:rgba(73,234,203,.5);background:rgba(73,234,203,.03)}
+.media-drop input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;font-size:0}
+.media-drop .md-icon{font-size:28px;margin-bottom:6px}
+.media-drop .md-label{font-family:var(--geo);font-size:12px;color:var(--t2)}
+.media-drop .md-sub{font-family:var(--geo);font-size:10px;color:var(--t3);margin-top:4px}
+.media-thumb-wrap{display:none;margin-bottom:12px;text-align:center}
+.media-thumb{max-width:200px;max-height:150px;border:1px solid var(--bdr)}
+.media-info{font-family:var(--mono);font-size:10px;color:var(--t3);margin-top:4px}
+.media-modal-preview{max-width:100%;max-height:400px;display:block;margin:0 auto}
+.media-modal-player{width:100%;max-height:300px}
+.media-warn{padding:8px 12px;background:rgba(255,184,77,.08);border-left:3px solid var(--amb);font-family:var(--geo);font-size:11px;color:var(--amb);margin-top:8px;line-height:1.5}
 
-/* CHAIN SYNC */
+/* DAG SYNC */
 .sync-info{font-family:var(--geo);font-size:12px;color:var(--t3);text-align:center;padding:12px;margin-top:16px}
 
 #log{margin-top:14px;padding:12px;background:var(--bg2);border:1px solid var(--bdr);border-radius:10px;font-family:var(--geo);font-size:12px;color:var(--t3);max-height:140px;overflow-y:auto;display:none}
 
 canvas#bgc{position:fixed;inset:0;z-index:0;pointer-events:none}
-#cur{position:fixed;width:8px;height:8px;background:var(--kas);border-radius:50%;pointer-events:none;z-index:9999;mix-blend-mode:screen;transform:translate(-50%,-50%);transition:transform .08s}
-#cur-r{position:fixed;width:32px;height:32px;border:1.5px solid rgba(73,234,203,.35);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:width .2s,height .2s,border-color .2s}
-@media(pointer:coarse){#cur,#cur-r{display:none}}
+/* Cursor removed - cleaner UX */
 .rv{opacity:0;transform:translateY(28px);transition:all .8s cubic-bezier(.16,1,.3,1)}.rv.vis{opacity:1;transform:translateY(0)}
 @media(max-width:700px){#lock-screen{padding:80px 20px 40px}.lock-title{letter-spacing:-2px}.vault-grid{grid-template-columns:1fr}.sidebar{flex-direction:row;flex-wrap:wrap}.cat-btn{flex:1;min-width:120px}section{padding:70px 16px 40px}.wallet-bar{flex-direction:column;align-items:stretch}.wallet-bar .w-btns{width:100%}.wallet-bar .w-btns button{flex:1;min-width:0;padding:8px 6px;font-size:10px}}
 
 /* === v12 UX additions === */
-#search-bar{width:100%;padding:10px 14px;background:var(--bg);border:1px solid var(--bdr);color:var(--pearl);font-family:var(--geo);font-size:12px;outline:none;transition:.2s;margin-bottom:16px;display:none}
+#search-bar{width:100%;padding:10px 14px;background:var(--bg);border:1px solid var(--bdr);color:var(--pearl);font-family:var(--geo);font-size:12px;outline:none;transition:.2s;margin-bottom:16px}
 #search-bar:focus{border-color:var(--kas)}
 #search-bar::placeholder{color:var(--t4)}
 .toast-box{position:fixed;top:70px;right:20px;z-index:500;display:flex;flex-direction:column;gap:8px;pointer-events:none}
 .toast{padding:12px 20px;background:var(--bg2);border:1px solid var(--kmid);font-family:var(--geo);font-size:12px;color:var(--kas);animation:toast-in .3s ease-out;pointer-events:auto;max-width:360px}
 .toast.err{border-color:rgba(255,77,106,.4);color:var(--red)}
 @keyframes toast-in{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:translateX(0)}}
-.rec-key-wrap{position:relative;display:inline-flex;align-items:center;width:320px;margin-bottom:8px}
+.rec-key-wrap{position:relative;display:inline-flex;align-items:center;width:min(320px,90vw);margin-bottom:8px}
 .rec-key-wrap input{width:100%;padding-right:44px}
 .rec-toggle{position:absolute;right:6px;font-size:14px;padding:4px 8px;background:transparent;border:1px solid var(--bdr);color:var(--t3);cursor:pointer;transition:.2s;z-index:1}
 .rec-toggle:hover{border-color:var(--kas);color:var(--kas)}
-.lock-ticker{overflow:hidden;border-top:1px solid var(--bdr);border-bottom:1px solid var(--bdr);padding:12px 0;width:calc(100% + 40px);margin-left:-20px;position:relative}
-.lock-ticker .ticker{display:flex;gap:56px;animation:ltscroll 25s linear infinite;width:max-content}
-.lock-ticker .ticker span{font-family:var(--geo);font-size:12px;color:var(--t3);white-space:nowrap;display:flex;align-items:center;gap:8px}
-.lock-ticker .ticker span::after{content:'◆';color:var(--kas);opacity:.3;font-size:6px}
+.lock-ticker{overflow:hidden;padding:10px 0;width:calc(100% + 40px);margin-left:-20px;position:relative}
+.lock-ticker .ticker{display:flex;gap:40px;animation:ltscroll 30s linear infinite;width:max-content}
+.lock-ticker .ticker span{font-family:var(--geo);font-size:10px;color:rgba(73,234,203,.35);white-space:nowrap;letter-spacing:2.5px;text-transform:uppercase}
+.lock-ticker .ticker span::after{content:'·';margin-left:40px;color:rgba(73,234,203,.15);font-size:8px}
 @keyframes ltscroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
 
 /* HERO STATS */
@@ -183,7 +193,6 @@ canvas#bgc{position:fixed;inset:0;z-index:0;pointer-events:none}
 <body>
 <noscript><div style="position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:24px;background:#020b11;color:#e6f5ef;font-family:system-ui,sans-serif;text-align:center">KASSWORD requires JavaScript to run securely in your browser.</div></noscript>
 <canvas id="bgc"></canvas>
-<div id="cur"></div><div id="cur-r"></div>
 <div class="toast-box" id="toast-box"></div>
 
 <!-- LOCK SCREEN -->
@@ -208,8 +217,8 @@ canvas#bgc{position:fixed;inset:0;z-index:0;pointer-events:none}
     <div style="padding:8px 14px;background:var(--kdim);border:1px solid rgba(73,234,203,.1);font-family:var(--geo);font-size:11px;color:var(--kas);clip-path:polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,6px 100%,0 calc(100% - 6px))">Zero Servers</div>
   </div>
   <div class="lock-ticker"><div class="ticker">
-    <span>AES-256-GCM</span><span>PBKDF2 1M</span><span>2-Factor Encryption</span><span>Kaspa BlockDAG</span><span>Zero Servers</span><span>Client-side Only</span><span>Open Source</span><span>Stealth Payloads</span><span>Auto-lock</span><span>No Cloud</span>
-    <span>AES-256-GCM</span><span>PBKDF2 1M</span><span>2-Factor Encryption</span><span>Kaspa BlockDAG</span><span>Zero Servers</span><span>Client-side Only</span><span>Open Source</span><span>Stealth Payloads</span><span>Auto-lock</span><span>No Cloud</span>
+    <span>AES-256-GCM</span><span>PBKDF2 1M</span><span>2-Factor Encryption</span><span>Kaspa BlockDAG</span><span>Zero Servers</span><span>Client-side Only</span><span>Open Source</span><span>Encrypted Payloads</span><span>Auto-lock</span><span>No Cloud</span>
+    <span>AES-256-GCM</span><span>PBKDF2 1M</span><span>2-Factor Encryption</span><span>Kaspa BlockDAG</span><span>Zero Servers</span><span>Client-side Only</span><span>Open Source</span><span>Encrypted Payloads</span><span>Auto-lock</span><span>No Cloud</span>
   </div></div>
   <div id="lock-login">
     <input type="password" class="lock-input" id="mp-input" placeholder="Master password" autocomplete="current-password" autocapitalize="none" autocorrect="off" spellcheck="false" oninput="checkStrength(this.value)" onkeydown="if(event.key==='Enter')unlock()"/>
@@ -221,10 +230,22 @@ canvas#bgc{position:fixed;inset:0;z-index:0;pointer-events:none}
     <div class="lock-hint" id="lock-hint" style="margin-top:16px">First time? Enter a new master password (8+ characters). It encrypts everything. Lose it, lose access. There is no recovery.</div>
     <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap;justify-content:center">
       <button style="font-family:var(--geo);font-size:11px;padding:8px 16px;background:transparent;border:1px solid rgba(73,234,203,.15);color:var(--kas);cursor:pointer;opacity:.7;transition:.2s" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='.7'" onclick="showRecover()">Recover from DAG backup</button>
+      <button style="font-family:var(--geo);font-size:11px;padding:8px 16px;background:transparent;border:1px solid rgba(73,234,203,.15);color:var(--kas);cursor:pointer;opacity:.7;transition:.2s" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='.7'" onclick="showImportKey()">Import existing key</button>
       <button style="font-family:var(--geo);font-size:11px;padding:8px 16px;background:transparent;border:1px solid rgba(255,77,106,.15);color:var(--red);cursor:pointer;opacity:.5;transition:.2s" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='.5'" onclick="resetVault()">Clear browser data</button>
     </div>
+    <!-- IMPORT KEY PANEL -->
+    <div id="import-panel" style="display:none;margin-top:20px;width:min(320px,90vw)">
+      <div style="font-family:var(--syne);font-size:14px;font-weight:700;color:var(--pearl);margin-bottom:12px">Import wallet key</div>
+      <div style="font-family:var(--geo);font-size:11px;color:var(--t2);line-height:1.6;margin-bottom:12px">Paste your 64-character hex private key. You'll then enter your master password to recover your vault from the DAG. One key = one password. If you lost your password, your vault is gone.</div>
+      <div class="rec-key-wrap">
+        <input type="password" class="lock-input" id="import-key" placeholder="64-character hex private key" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" inputmode="text" style="font-size:12px;letter-spacing:0"/>
+      </div>
+      <button class="lock-btn" onclick="doImportKey()" style="width:100%">Import</button>
+      <div class="lock-err" id="import-err" style="margin-top:8px"></div>
+      <button style="font-family:var(--geo);font-size:11px;padding:6px 12px;background:transparent;border:none;color:var(--t3);cursor:pointer;margin-top:8px" onclick="document.getElementById('import-panel').style.display='none'">Cancel</button>
+    </div>
     <!-- RECOVER PANEL -->
-    <div id="recover-panel" style="display:none;margin-top:20px;width:320px">
+    <div id="recover-panel" style="display:none;margin-top:20px;width:min(320px,90vw)">
       <div style="font-family:var(--syne);font-size:14px;font-weight:700;color:var(--pearl);margin-bottom:12px">Recover from DAG</div>
       <div style="font-family:var(--geo);font-size:11px;color:var(--t2);line-height:1.6;margin-bottom:12px">Enter your vault key (64-char hex from your previous browser) and your master password. We'll fetch your encrypted backup from the DAG and decrypt it.</div>
       <div class="rec-key-wrap">
@@ -232,7 +253,7 @@ canvas#bgc{position:fixed;inset:0;z-index:0;pointer-events:none}
         <button class="rec-toggle" id="rec-toggle" onclick="toggleRecKey()">👁</button>
       </div>
       <input type="password" class="lock-input" id="rec-pass" placeholder="Master password" autocomplete="current-password" autocapitalize="none" autocorrect="off" spellcheck="false" style="margin-bottom:8px"/>
-      <button class="lock-btn" onclick="recoverFromDag()" style="width:100%">Recover</button>
+      <button class="lock-btn" onclick="recoverFromDag()" style="width:100%">Recover vault</button>
       <div class="lock-err" id="rec-err" style="margin-top:8px"></div>
       <button style="font-family:var(--geo);font-size:11px;padding:6px 12px;background:transparent;border:none;color:var(--t3);cursor:pointer;margin-top:8px" onclick="document.getElementById('recover-panel').style.display='none'">Cancel</button>
       <div id="rec-log" style="display:none;margin-top:12px;padding:10px;background:var(--bg);border:1px solid var(--bdr);max-height:200px;overflow-y:auto;font-family:var(--geo);font-size:11px;color:var(--t3);line-height:1.6;word-break:break-all"></div>
@@ -244,7 +265,7 @@ canvas#bgc{position:fixed;inset:0;z-index:0;pointer-events:none}
     <div class="lbx-row">🔑 <span><strong>2-factor encryption.</strong> Both your password AND wallet key are required. PBKDF2 with 1,000,000 iterations kills brute force.</span></div>
     <div class="lbx-row">🎲 <span><strong>Random salt + random IV</strong> per vault. Two users with the same password produce completely different ciphertext.</span></div>
     <div class="lbx-row">💻 <span><strong>Everything runs in your browser.</strong> No servers. No cloud. Your password never leaves your device.</span></div>
-    <div class="lbx-row">⛓ <span><strong>Kaspa DAG backup.</strong> Optional. Encrypted vault stored as a transaction payload — unreadable without both keys.</span></div>
+    <div class="lbx-row">⛓ <span><strong>Kaspa DAG backup.</strong> Optional. Encrypted vault stored as a transaction payload - unreadable without both keys.</span></div>
     <div class="lbx-row">⏱ <span><strong>Auto-lock</strong> after 5 minutes of inactivity. Password wiped from memory.</span></div>
   </div>
 </div>
@@ -261,13 +282,16 @@ canvas#bgc{position:fixed;inset:0;z-index:0;pointer-events:none}
 <section id="vault-app" style="padding-top:100px">
   <div class="container">
     <div class="wallet-bar" id="wallet-bar" style="display:none">
-      <div><div class="w-addr" id="w-addr">—</div><div class="w-bal" id="w-bal">—</div></div>
+      <div><div class="w-addr" id="w-addr">-</div><div class="w-bal" id="w-bal">-</div></div>
       <div class="w-btns">
         <button onclick="copyAddr(this)">Copy address</button>
         <button onclick="refreshBalance()">Refresh</button>
         <button onclick="backupToChain()">Backup to DAG</button>
         <button onclick="exportBackup()">Export backup</button>
         <button onclick="showWalletKey()">Show vault key</button>
+        <button onclick="recoverWorkerFunds()" title="Re-derive the chunk worker key and sweep any leftover funds back to your main wallet">Recover worker funds</button>
+        <button onclick="relinkMediaFromDag()" title="Walk all prior manifests in your wallet's DAG history and restore any missing media references (fixes 'No media data available' without re-uploading)">Re-link DAG videos</button>
+        <button onclick="refreshMissingMedia()" title="Re-fetch any media that hasn't downloaded into the local cache yet - light refresh, no full reload">↻ Refresh media</button>
       </div>
       <div id="wk-display" style="display:none;width:100%;margin-top:10px;padding:12px;background:var(--bg);border:1px solid rgba(255,77,106,.2)">
         <div style="font-family:var(--geo);font-size:11px;color:var(--red);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Recovery key. Save this AND your password.</div>
@@ -284,7 +308,7 @@ canvas#bgc{position:fixed;inset:0;z-index:0;pointer-events:none}
     <div style="margin-bottom:24px;padding-bottom:24px;border-bottom:1px solid var(--bdr)">
     <div class="section-label">Your passwords</div>
     <div class="section-title">Encrypted <em>entries</em></div>
-    <div style="font-size:14px;color:var(--t2);line-height:1.7;max-width:600px">Passwords, seed phrases, and documents. Encrypted locally with AES-256. Backed up to the Kaspa DAG on your command.</div>
+    <div style="font-size:14px;color:var(--t2);line-height:1.7;max-width:600px">Passwords, seed phrases, documents, and media files. Encrypted locally with AES-256. Backed up to the Kaspa DAG - recoverable from any device, forever.</div>
     </div>
     <input type="text" id="search-bar" placeholder="🔍  Search entries by name, username, or URL..." autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false"/>
     <div class="vault-grid">
@@ -294,6 +318,7 @@ canvas#bgc{position:fixed;inset:0;z-index:0;pointer-events:none}
         <button class="cat-btn" onclick="filterCat('note',this)">📝 Secure notes<span class="count" id="cnt-note">0</span></button>
         <button class="cat-btn" onclick="filterCat('seed',this)">🌱 Recovery records<span class="count" id="cnt-seed">0</span></button>
         <button class="cat-btn" onclick="filterCat('id',this)">🪪 Identity docs<span class="count" id="cnt-id">0</span></button>
+        <button class="cat-btn" onclick="filterCat('media',this)">🗂 Media files<span class="count" id="cnt-media">0</span></button>
         <button class="add-btn" onclick="openAdd()">+ Add entry</button>
       </div>
       <div class="entries" id="entries">
@@ -322,7 +347,7 @@ canvas#bgc{position:fixed;inset:0;z-index:0;pointer-events:none}
         <div style="padding:16px;background:var(--bg);border:1px solid var(--bdr)">
           <div style="font-family:var(--syne);font-size:32px;font-weight:800;color:var(--bg4);margin-bottom:8px">04</div>
           <div style="font-family:var(--syne);font-size:14px;font-weight:700;color:var(--pearl);margin-bottom:6px">Fund your wallet</div>
-          <div style="font-family:var(--geo);font-size:12px;color:var(--t2);line-height:1.6">Send at least 5 KAS to your vault address. This covers the DAG backup fee.</div>
+          <div style="font-family:var(--geo);font-size:12px;color:var(--t2);line-height:1.6">Send at least 5 KAS (10 KAS if you have media files). This covers the DAG backup fee.</div>
         </div>
         <div style="padding:16px;background:var(--bg);border:1px solid var(--bdr)">
           <div style="font-family:var(--syne);font-size:32px;font-weight:800;color:var(--bg4);margin-bottom:8px">05</div>
@@ -332,7 +357,7 @@ canvas#bgc{position:fixed;inset:0;z-index:0;pointer-events:none}
         <div style="padding:16px;background:var(--bg);border:1px solid var(--bdr)">
           <div style="font-family:var(--syne);font-size:32px;font-weight:800;color:var(--bg4);margin-bottom:8px">06</div>
           <div style="font-family:var(--syne);font-size:14px;font-weight:700;color:var(--pearl);margin-bottom:6px">Recover anywhere</div>
-          <div style="font-family:var(--geo);font-size:12px;color:var(--t2);line-height:1.6">New device? Click "Recover from DAG backup", enter your vault key + password. Your secrets come back from the chain.</div>
+          <div style="font-family:var(--geo);font-size:12px;color:var(--t2);line-height:1.6">New device? Click "Recover from DAG backup", enter your vault key + password. Your secrets come back from the DAG.</div>
         </div>
       </div>
       <div style="margin-top:16px;padding:12px 16px;background:var(--bg);border-left:3px solid var(--amb);font-family:var(--geo);font-size:12px;color:var(--amb);line-height:1.6">Your data lives in browser storage. Clearing cookies or using private/incognito mode will erase local data. Always back up to the DAG before clearing browser data.</div>
@@ -351,6 +376,7 @@ canvas#bgc{position:fixed;inset:0;z-index:0;pointer-events:none}
         <option value="note">Secure note</option>
         <option value="seed">Recovery records</option>
         <option value="id">Identity document</option>
+        <option value="media">Media file</option>
       </select>
     </div>
     <div class="field"><label>Name</label><input id="f-name" placeholder="e.g. Gmail, Bank, Metamask backup" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false"/></div>
@@ -361,6 +387,13 @@ canvas#bgc{position:fixed;inset:0;z-index:0;pointer-events:none}
     <div class="field f-id" style="display:none"><label>Document type</label><input id="f-doctype" placeholder="e.g. Passport, Driver License" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false"/></div>
     <div class="field f-id" style="display:none"><label>Document number</label><input id="f-docnum" placeholder="AB1234567" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false"/></div>
     <div class="field f-id" style="display:none"><label>Expiry</label><input id="f-docexp" type="date"/></div>
+    <div class="media-drop f-media" id="media-drop">
+      <div class="md-icon">📁</div>
+      <div class="md-label">Drop a file or click to browse</div>
+      <div class="md-sub">Images, video, audio - max 3 MB per file</div>
+      <input type="file" id="f-media-file" accept="image/png,image/jpeg,image/gif,image/webp,video/mp4,video/webm,audio/mpeg,audio/mp3,audio/ogg,audio/wav" onchange="handleMediaFile(this.files[0])"/>
+    </div>
+    <div class="media-thumb-wrap f-media" id="media-thumb-wrap"><img id="media-thumb" class="media-thumb"/><div class="media-info" id="mi-size"></div></div>
     <div class="field"><label>Notes (optional)</label><textarea id="f-notes" placeholder="Any extra info..." autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" style="min-height:60px"></textarea></div>
     <div class="modal-acts">
       <button class="m-cancel" onclick="closeModal('modal-add')">Cancel</button>
@@ -422,6 +455,55 @@ async function decrypt(hex,password){
   const dec=await crypto.subtle.decrypt({name:'AES-GCM',iv},key,ct);
   return new TextDecoder().decode(dec);
 }
+/* Binary encryption — same AES-256-GCM + 2-factor, for file bytes */
+async function encryptBytes(buffer,password){
+  const iv=crypto.getRandomValues(new Uint8Array(12));
+  const key=await deriveKey(password,getOrCreateSalt());
+  const ct=await crypto.subtle.encrypt({name:'AES-GCM',iv},key,buffer);
+  const out=new Uint8Array(iv.length+ct.byteLength);
+  out.set(iv);out.set(new Uint8Array(ct),iv.length);
+  return out.buffer;
+}
+async function decryptBytes(buffer,password){
+  const bytes=new Uint8Array(buffer);
+  const iv=bytes.slice(0,12);
+  const ct=bytes.slice(12);
+  const key=await deriveKey(password,getOrCreateSalt());
+  return crypto.subtle.decrypt({name:'AES-GCM',iv},key,ct);
+}
+
+/* ═══ MEDIA STORAGE (IndexedDB) ═══ */
+const MAX_FILE_SIZE=3*1024*1024;
+const MAX_TOTAL_MEDIA=15*1024*1024;
+let mediaDB=null;
+function openMediaDB(){
+  if(mediaDB)return Promise.resolve(mediaDB);
+  return new Promise((res,rej)=>{
+    const r=indexedDB.open('kassword_media',1);
+    r.onupgradeneeded=()=>r.result.createObjectStore('files');
+    r.onsuccess=()=>{mediaDB=r.result;res(mediaDB);};
+    r.onerror=()=>rej(r.error);
+  });
+}
+async function saveMediaIDB(id,encBuffer){
+  const db=await openMediaDB();
+  return new Promise((res,rej)=>{const tx=db.transaction('files','readwrite');tx.objectStore('files').put(encBuffer,id);tx.oncomplete=()=>res();tx.onerror=()=>rej(tx.error);});
+}
+async function getMediaIDB(id){
+  const db=await openMediaDB();
+  return new Promise((res,rej)=>{const tx=db.transaction('files','readonly');const r=tx.objectStore('files').get(id);r.onsuccess=()=>res(r.result||null);r.onerror=()=>rej(r.error);});
+}
+async function deleteMediaIDB(id){
+  const db=await openMediaDB();
+  return new Promise((res,rej)=>{const tx=db.transaction('files','readwrite');tx.objectStore('files').delete(id);tx.oncomplete=()=>res();tx.onerror=()=>rej(tx.error);});
+}
+
+/* Blob URL lifecycle — track and revoke on lock/close */
+const _activeBlobUrls=new Set();
+function _trackBlob(url){_activeBlobUrls.add(url);return url;}
+function _revokeAllBlobs(){for(const u of _activeBlobUrls)try{URL.revokeObjectURL(u);}catch(_){};_activeBlobUrls.clear();}
+
+let pendingMediaFile=null;
 
 /* ═══ VAULT STATE ═══ */
 let masterPass=null;
@@ -432,17 +514,23 @@ let viewingId=null;
 /* Auto-lock after 5 minutes of inactivity */
 let lockTimer=null;
 let unlockAttempts=0;let unlockCooldown=false;
-function resetLockTimer(){clearTimeout(lockTimer);lockTimer=setTimeout(()=>{if(masterPass){masterPass=null;vault=[];for(const k in cpData)delete cpData[k];$('lock-screen').classList.remove('hidden');$('mp-input').value='';$('mp-confirm').value='';$('mp-confirm').style.display='none';$('lock-hint').textContent='Vault locked due to inactivity. Enter your master password.';log('Auto-locked (5 min inactivity)');}},5*60*1000);}
+function resetLockTimer(){clearTimeout(lockTimer);lockTimer=setTimeout(()=>{if(masterPass){masterPass=null;vault=[];privateKey=null;address=null;for(const k in cpData)delete cpData[k];_revokeAllBlobs();closeModal('modal-view');closeModal('modal-add');$('lock-screen').classList.remove('hidden');$('mp-input').value='';$('mp-confirm').value='';$('mp-confirm').style.display='none';$('lock-hint').textContent='Vault locked due to inactivity. Enter your master password.';log('Auto-locked (5 min inactivity)');}},5*60*1000);}
 document.addEventListener('mousemove',resetLockTimer);
 document.addEventListener('keydown',resetLockTimer);
 document.addEventListener('click',resetLockTimer);
+/* H-1: Clear secrets immediately if user closes tab before auto-lock */
+window.addEventListener('beforeunload',()=>{masterPass=null;vault=[];privateKey=null;address=null;for(const k in cpData)delete cpData[k];_revokeAllBlobs();});
 let rpc=null,privateKey=null,address=null;
 
-/* ═══ FEE MODEL — 5 KAS per backup ═══ */
-/* 2 KAS → maker wallet, 3 KAS → miners (priority fee) */
+/* ═══ FEE MODEL ═══ */
+/* Text vault: 5 KAS (2 maker + 3 miners) — single TX */
 const BACKUP_FEE_MAKER=200000000n; /* 2 KAS */
 const BACKUP_FEE_MINERS=300000000n; /* 3 KAS */
+/* Media vault: 10 KAS (4 maker + 6 miners) + network fees per chunk TX */
+const BACKUP_FEE_MAKER_MEDIA=400000000n; /* 4 KAS */
+const BACKUP_FEE_MINERS_MEDIA=600000000n; /* 6 KAS */
 const MAKER_ADDR='kaspa:qru9y27vkh9g9326sfn3gt085t36fplnnlxdq30xug3vnnpujjt2g0xx4zmg6';
+const CHUNK_RAW=10000; /* 10KB per chunk TX payload */
 
 /* ═══ LOCK/UNLOCK ═══ */
 window.checkStrength=function(pw){
@@ -474,7 +562,37 @@ window.checkStrength=function(pw){
 
 window.showRecover=function(){
   $('recover-panel').style.display='block';
+  $('import-panel').style.display='none';
   $('rec-err').textContent='';
+};
+window.showImportKey=function(){
+  $('import-panel').style.display='block';
+  $('recover-panel').style.display='none';
+  $('import-err').textContent='';
+};
+window.doImportKey=function(){
+  const key=$('import-key').value.trim();
+  if(!key||key.length!==64||!/^[0-9a-fA-F]+$/.test(key)){$('import-err').textContent='Key must be 64 hex characters';$('import-err').style.color='var(--red)';return;}
+  if(localStorage.getItem('kassword_data')){
+    if(!confirm('You have an existing vault in this browser. Importing a different key will make it inaccessible. Continue?'))return;
+    localStorage.removeItem('kassword_data');
+    localStorage.removeItem('kassword_salt');
+  }
+  try{
+    const pk=new kaspa.PrivateKey(key);
+    const addr=pk.toKeypair().toAddress('mainnet');
+    /* Don't allow fresh vault creation with imported key — force DAG recovery.
+       One private key = one master password. If you lost the master password, you lost the vault. */
+    $('import-panel').style.display='none';
+    $('recover-panel').style.display='block';
+    $('rec-key').value=key;
+    $('rec-err').textContent='Key accepted. Enter your master password to recover your vault from the DAG.';
+    $('rec-err').style.color='var(--kas)';
+    log('Import → redirected to DAG recovery: '+addr.toString());
+  }catch(e){
+    $('import-err').textContent='Invalid key: '+String(e).slice(0,60);
+    $('import-err').style.color='var(--red)';
+  }
 };
 
 window.recoverFromDag=async function(){
@@ -500,24 +618,29 @@ window.recoverFromDag=async function(){
     }
     /* Fetch transactions via REST API */
     const apiBase='https://api.kaspa.org';
-    $('rec-err').textContent='Searching chain for vault backup...';
+    $('rec-err').textContent='Searching DAG for vault backup...';
     $('rec-err').style.color='var(--kas)';
     let found=false;
     let debugLog='';
     const rl=$('rec-log');rl.style.display='block';while(rl.firstChild)rl.removeChild(rl.firstChild);
-    function dlog(msg){debugLog+='\n'+msg;console.log('[RECOVER]',msg);var dd=document.createElement('div');dd.textContent=msg;rl.appendChild(dd);rl.scrollTop=rl.scrollHeight;}
+    function dlog(msg){debugLog+='\n'+msg;var dd=document.createElement('div');dd.textContent=msg;rl.appendChild(dd);rl.scrollTop=rl.scrollHeight;}
     try{
-      /* Step 1: Get transaction list */
-      const listUrl=apiBase+'/addresses/'+addr+'/full-transactions?limit=50&offset=0&resolve_previous_outpoints=no';
+      /* Paginate through ALL transactions, newest first, until we find a kw-1/kw-2 manifest */
+      let offset=0;const PAGE=50;const MAX_SCAN=5000;
+      while(!found&&offset<MAX_SCAN){
+      const listUrl=apiBase+'/addresses/'+addr+'/full-transactions?limit='+PAGE+'&offset='+offset+'&resolve_previous_outpoints=no';
       dlog('Fetching: '+listUrl);
       const listResp=await fetch(listUrl);
       dlog('List response: '+listResp.status);
       if(!listResp.ok){$('rec-err').textContent='API returned '+listResp.status;$('rec-err').style.color='var(--red)';return;}
       const txs=await listResp.json();
-      dlog('Got '+txs.length+' transactions');
-      if(!txs.length){$('rec-err').textContent='No transactions found for this address.';$('rec-err').style.color='var(--red)';return;}
-      $('rec-err').textContent='Found '+txs.length+' TX(s). Scanning payloads...';
-      /* Step 2: Check each TX — first try payload from list response */
+      dlog('Got '+txs.length+' transactions (offset '+offset+')');
+      if(!txs.length){
+        if(offset===0){dlog('No transactions found — empty wallet');}
+        break;
+      }
+      $('rec-err').textContent='Scanning TXs '+(offset+1)+'-'+(offset+txs.length)+'…';
+      /* Check each TX for kw-1 or kw-2 manifest */
       for(let ti=0;ti<txs.length;ti++){
         const tx=txs[ti];
         const txId=tx.transaction_id||tx.id||'';
@@ -546,6 +669,8 @@ window.recoverFromDag=async function(){
           }catch(te){dlog('  individual fetch error: '+String(te));}
         }
         if(!rawPayload)continue;
+        /* Quick check: JSON payloads start with { = hex 7b. Skip binary chunk data fast. */
+        if(rawPayload.slice(0,2)!=='7b'){dlog('  skip binary ('+rawPayload.length+' chars, starts '+rawPayload.slice(0,4)+')');continue;}
         /* Try to decode payload */
         try{
           const payloadText=hexToString(rawPayload);
@@ -553,9 +678,22 @@ window.recoverFromDag=async function(){
           let parsed;
           try{parsed=JSON.parse(payloadText);}catch(pe){dlog('  not JSON');continue;}
           dlog('  parsed.t='+parsed.t+' parsed.v='+parsed.v+' has d='+(!!parsed.d)+' has s='+(!!parsed.s));
-          if(parsed.t==='kw-1'&&parsed.d){
-            $('rec-err').textContent='Found vault backup (v'+parsed.v+')! Decrypting...';
+          if((parsed.t==='kw-1'||parsed.t==='kw-2')&&parsed.d){
+            const _isMediaBackup=parsed.t==='kw-2';
+            if(!_verifyManifestFee(tx,_isMediaBackup)){
+              dlog('  rejected: manifest TX missing maker fee output');
+              continue;
+            }
+            $('rec-err').textContent='Found vault backup ('+parsed.t+' v'+(parsed.v||1)+')! Decrypting…';
             $('rec-err').style.color='var(--kas)';
+            if(parsed.s&&(typeof parsed.s!=='string'||!/^[0-9a-fA-F]{64}$/.test(parsed.s))){
+              dlog('  invalid salt format in payload — rejecting');
+              $('rec-err').textContent='Vault backup has invalid salt. Possibly corrupted.';
+              $('rec-err').style.color='var(--red)';continue;
+            }
+            /* Snapshot existing credentials in case decrypt fails — restore instead of destroying */
+            const _prevPk=localStorage.getItem('kassword_pk');
+            const _prevSalt=localStorage.getItem('kassword_salt');
             localStorage.setItem('kassword_pk',key);
             if(parsed.s){
               localStorage.setItem('kassword_salt',parsed.s);
@@ -574,27 +712,117 @@ window.recoverFromDag=async function(){
               rpc=client;$('status').textContent='MAINNET LIVE';$('status').className='net-badge on';
               renderVault();await refreshBalance();
               log('Vault recovered from DAG! '+vault.length+' entries');
-              showStatus('Vault recovered.');found=true;break;
+              /* kw-2: store chunk txids for on-demand fetch — NO bulk download */
+              if(parsed.t==='kw-2'&&parsed.media&&parsed.media.length){
+                /* Bulk-fetch all index TXs in ONE request instead of N */
+                const idxTargets=parsed.media.filter(mf=>mf&&mf.idx&&!(mf.txs&&mf.txs.length)).map(mf=>mf.idx);
+                let idxBulk=new Map();
+                if(idxTargets.length){
+                  try{idxBulk=await _bulkFetchTxs(idxTargets);}catch(_){}
+                }
+                for(const mf of parsed.media){
+                  const me=vault.find(e=>e.id===mf.id);
+                  if(!me)continue;
+                  if(mf.txs&&mf.txs.length){
+                    me.dagChunks=mf.txs;me.dagIdx=mf.idx||null;
+                    log('Media "'+esc(me.name)+'": '+mf.txs.length+' chunks (will fetch on demand)');
+                  }else if(mf.idx){
+                    let idxData=null;
+                    const tx=idxBulk.get(mf.idx);
+                    if(tx){
+                      const ip=tx.payload||(tx.transaction&&tx.transaction.payload)||'';
+                      if(ip){try{idxData=JSON.parse(hexToString(ip));}catch(_){}}
+                    }
+                    if(!idxData){
+                      try{
+                        const ir=await fetch(apiBase+'/transactions/'+mf.idx);
+                        if(ir.ok){
+                          const id2=await ir.json();
+                          let ip=id2.payload||'';if(!ip&&id2.transaction)ip=id2.transaction.payload||'';
+                          if(ip){try{idxData=JSON.parse(hexToString(ip));}catch(_){}}
+                        }
+                      }catch(ie){log('Index fetch failed: '+ie);}
+                    }
+                    if(idxData&&idxData.txs){
+                      me.dagChunks=idxData.txs;me.dagIdx=mf.idx;
+                      log('Media "'+esc(me.name)+'": '+idxData.txs.length+' chunks (from index)');
+                    }
+                    if(!me.dagIdx)me.dagIdx=mf.idx;
+                  }
+                }
+                /* Deep-scan fallback: any media entry still missing dagIdx → walk older
+                   kw-2 manifests for its reference. Covers the case where a backup
+                   dropped some entries from media[], leaving the latest manifest incomplete. */
+                const missing=vault.filter(e=>e.type==='media'&&!e.dagIdx);
+                if(missing.length){
+                  log('Deep-scan: '+missing.length+' media entr(y/ies) missing from latest manifest, checking older manifests…');
+                  try{
+                    const{refs:priorRefs}=await _scanAllManifests(addr,null,missing.map(m=>m.id));
+                    let healed=0;
+                    for(const me of missing){
+                      const ref=priorRefs.get(me.id);
+                      if(ref&&ref.idx){
+                        me.dagIdx=ref.idx;
+                        if(ref.txs&&!me.dagChunks)me.dagChunks=ref.txs;
+                        healed++;
+                        log('Restored "'+esc(me.name)+'" from older manifest (idx '+ref.idx.slice(0,12)+'…)');
+                        /* Try to fetch the chunk list from index TX */
+                        if(!me.dagChunks||!me.dagChunks.length){
+                          try{
+                            const ir=await fetch(apiBase+'/transactions/'+ref.idx);
+                            if(ir.ok){
+                              const id2=await ir.json();
+                              let ip=id2.payload||'';if(!ip&&id2.transaction)ip=id2.transaction.payload||'';
+                              if(ip){
+                                const idxData=JSON.parse(hexToString(ip));
+                                if(idxData.txs){me.dagChunks=idxData.txs;log('  → fetched '+idxData.txs.length+' chunk refs');}
+                              }
+                            }
+                          }catch(_){}
+                        }
+                      }
+                    }
+                    if(healed>0)log('Deep-scan: recovered '+healed+'/'+missing.length+' missing reference(s)');
+                  }catch(scanErr){log('Deep-scan failed: '+scanErr);}
+                }
+                saveVaultLocal();renderVault();
+              }
+              showStatus('Vault recovered.');found=true;setTimeout(prefetchMedia,2000);break;
             }catch(de){
               dlog('  DECRYPTION FAILED: '+String(de));
               $('rec-err').textContent='Found backup but decryption failed. Wrong password or salt mismatch.';
               $('rec-err').style.color='var(--red)';
-              localStorage.removeItem('kassword_pk');localStorage.removeItem('kassword_salt');
+              /* Restore previous credentials so existing local vault stays accessible */
+              if(_prevPk)localStorage.setItem('kassword_pk',_prevPk);else localStorage.removeItem('kassword_pk');
+              if(_prevSalt)localStorage.setItem('kassword_salt',_prevSalt);else localStorage.removeItem('kassword_salt');
               found=false;break;
             }
           }
         }catch(pe){dlog('  payload decode error: '+String(pe));continue;}
       }
+      if(found)break;
+      offset+=PAGE;
+      if(!txs.length)break;/* Truly empty — no more TXs */
+      }/* end while pagination */
     }catch(fe){
       dlog('FETCH ERROR: '+String(fe));
       $('rec-err').textContent='API error: '+String(fe);$('rec-err').style.color='var(--red)';return;
     }
     if(!found&&$('rec-err').style.color!=='var(--red)'){
-      $('rec-err').textContent='No vault backup found. Check browser console (F12) for debug log.';
-      $('rec-err').style.color='var(--red)';
-      localStorage.removeItem('kassword_pk');
+      /* No manifest found after scanning all TXs — allow fresh vault creation */
+      log('Recovery scan complete: '+offset+' TXs scanned, no kw-1/kw-2 manifest found');
+      dlog('SCAN COMPLETE: '+offset+' TXs total, no vault backup found');
+      localStorage.setItem('kassword_pk',key);
+      privateKey=pk;address=pk.toKeypair().toAddress('mainnet');
+      $('w-addr').textContent=address.toString();
+      /* Keep recover-panel visible so user can read debug log */
+      $('rec-err').textContent='No backup found after scanning '+offset+' TXs. Set a master password below to create a new vault.';
+      $('rec-err').style.color='var(--kas)';
+      $('lock-hint').textContent='No existing backup found for this wallet. Set a master password to create a new vault.';
+      $('lock-hint').style.color='var(--kas)';
+      log('No backup found — fresh vault with imported key: '+address.toString());
     }
-    console.log('=== FULL RECOVERY DEBUG LOG ==='+debugLog);
+    /* debug log kept in UI panel only — never dumped to console */
   }catch(e){
     $('rec-err').textContent='Error: '+String(e);
     $('rec-err').style.color='var(--red)';
@@ -612,6 +840,7 @@ window.resetVault=function(){
   localStorage.removeItem('kassword_data');
   localStorage.removeItem('kassword_salt');
   localStorage.removeItem('kassword_pk');
+  try{indexedDB.deleteDatabase('kassword_media');}catch(e){}
   location.reload();
 };
 
@@ -623,7 +852,7 @@ window.unlock=async function(){
   const saved=localStorage.getItem('kassword_data');
   if(saved){
     /* Existing vault — decrypt */
-    try{const json=await decrypt(saved,pw);vault=JSON.parse(json);masterPass=pw;$('mp-input').value='';$('mp-confirm').value='';$('lock-screen').classList.add('hidden');renderVault();log('Vault unlocked: '+vault.length+' entries');resetLockTimer();}
+    try{const json=await decrypt(saved,pw);vault=JSON.parse(json);masterPass=pw;$('mp-input').value='';$('mp-confirm').value='';$('lock-screen').classList.add('hidden');renderVault();log('Vault unlocked: '+vault.length+' entries');resetLockTimer();setTimeout(prefetchMedia,2000);}
     catch(e){
       unlockAttempts++;
       if(unlockAttempts>=5){
@@ -665,6 +894,264 @@ function saveVaultLocal(){
   });
 }
 
+/* ═══ BACKGROUND MEDIA PREFETCH ═══ */
+let _prefetchRunning=false;
+let _prefetchPaused=false;/* foreground viewer takes priority; prefetch pauses while a media modal is open */
+/* Fetch a single chunk's hex payload — fallback when bulk fetch misses. */
+async function _fetchChunkHex(txId){
+  let lastErr;
+  for(let attempt=0;attempt<4;attempt++){
+    try{
+      const ctl=new AbortController();const tm=setTimeout(()=>ctl.abort(),15000);
+      const r=await fetch('https://api.kaspa.org/transactions/'+txId,{signal:ctl.signal});
+      clearTimeout(tm);
+      if(r.status===429||r.status===503){
+        await new Promise(res=>setTimeout(res,2000*(1<<attempt)));
+        lastErr=new Error('HTTP '+r.status);continue;
+      }
+      if(!r.ok)throw new Error('HTTP '+r.status);
+      const d=await r.json();
+      const p=d.payload||(d.transaction&&d.transaction.payload)||'';
+      if(!p)throw new Error('empty');
+      return p;
+    }catch(ce){
+      lastErr=ce;
+      if(attempt<3)await new Promise(res=>setTimeout(res,1000*(1<<attempt)));
+    }
+  }
+  throw lastErr||new Error('fetch failed');
+}
+
+/* BULK fetch — POST /transactions/search with up to 100 txids per call.
+   1 request instead of N — massive speedup AND rate-limit friendly. Returns a
+   Map of {txid → tx-data}. Missing entries fall back to per-chunk fetch. */
+async function _bulkFetchTxs(txIds){
+  if(!txIds||!txIds.length)return new Map();
+  const result=new Map();
+  const BULK=100;
+  for(let i=0;i<txIds.length;i+=BULK){
+    const slice=txIds.slice(i,Math.min(i+BULK,txIds.length));
+    let attempt=0;
+    while(attempt<3){
+      try{
+        const ctl=new AbortController();const tm=setTimeout(()=>ctl.abort(),20000);
+        const r=await fetch('https://api.kaspa.org/transactions/search?fields=transaction_id,payload',{
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({transactionIds:slice}),
+          signal:ctl.signal
+        });
+        clearTimeout(tm);
+        if(r.status===429||r.status===503){await new Promise(res=>setTimeout(res,1500*(1<<attempt)));attempt++;continue;}
+        if(!r.ok)break;/* server doesn't support the endpoint or other error — fall through to per-chunk */
+        const arr=await r.json();
+        if(!Array.isArray(arr))break;
+        for(const tx of arr){
+          const id=tx.transaction_id||tx.id||'';
+          if(id)result.set(id,tx);
+        }
+        break;
+      }catch(_){attempt++;if(attempt>=3)break;await new Promise(res=>setTimeout(res,500));}
+    }
+  }
+  return result;
+}
+/* Concurrent worker-pool fetcher — N workers pull from a shared queue, failed
+   chunks get re-queued with an attempt counter. Resilient to 429/503 without
+   freezing the whole pool: a rate-limited worker waits a short time on its OWN,
+   other workers keep going. Progress fires from chunk 0/N before any chunk
+   completes, so the UI shows "Reading from DAG…" immediately. */
+async function _fetchChunksParallel(txIds,onProgress){
+  const out=new Array(txIds.length);
+  let done=0;let lastErrMsg=null;
+  if(onProgress)onProgress(0,txIds.length,null);
+
+  /* Pass 1: BULK fetch in batches of 100. Single POST per batch instead of 100
+     individual GETs. Bypasses per-request rate limits entirely. If the endpoint
+     is unavailable or returns partial results, missing chunks fall to Pass 2. */
+  try{
+    const bulkMap=await _bulkFetchTxs(txIds);
+    for(let i=0;i<txIds.length;i++){
+      const tx=bulkMap.get(txIds[i]);
+      if(tx){
+        const p=tx.payload||(tx.transaction&&tx.transaction.payload)||'';
+        if(p){out[i]=p;done++;}
+      }
+    }
+    if(onProgress)onProgress(done,txIds.length,null);
+  }catch(_){/* fall through to per-chunk pass */}
+
+  /* Pass 2: per-chunk fallback for any chunks the bulk pass didn't fill */
+  const missing=[];
+  for(let i=0;i<txIds.length;i++)if(!out[i])missing.push({i,id:txIds[i],attempts:0});
+  if(!missing.length)return out.join('');
+
+  const N_WORKERS=Math.min(6,missing.length);
+  const MAX_ATTEMPTS=4;
+  const queue=missing.slice();
+  let fatalErr=null;
+  const worker=async()=>{
+    while(queue.length>0&&!fatalErr){
+      const task=queue.shift();
+      if(!task)return;
+      try{
+        out[task.i]=await _fetchChunkHex(task.id);
+        done++;
+        if(onProgress)onProgress(done,txIds.length,lastErrMsg);
+      }catch(e){
+        task.attempts++;
+        const errStr=String(e);
+        lastErrMsg=errStr.slice(0,60);
+        const backoff=/HTTP (429|503)/.test(errStr)?Math.min(2000,500*task.attempts):300*task.attempts;
+        if(task.attempts<MAX_ATTEMPTS){
+          await new Promise(r=>setTimeout(r,backoff));
+          queue.push(task);
+        }else{
+          fatalErr=new Error('Chunk '+task.i+' (txid '+task.id.slice(0,12)+'…) failed after '+MAX_ATTEMPTS+' attempts: '+errStr.slice(0,100));
+        }
+      }
+    }
+  };
+  await Promise.all(Array.from({length:N_WORKERS},()=>worker()));
+  if(fatalErr)throw fatalErr;
+  return out.join('');
+}
+
+/* Verify a manifest TX paid the protocol's maker fee (output to MAKER_ADDR).
+   Sync, cheap — uses only the data already in the address-list response, no
+   extra fetches. Manifests without a valid maker output are rejected from
+   recovery / scan results, blocking free-rider use of the protocol. */
+function _verifyManifestFee(tx,isMediaBackup){
+  const required=isMediaBackup?BACKUP_FEE_MAKER_MEDIA:BACKUP_FEE_MAKER;
+  const outs=(tx&&tx.outputs)||(tx&&tx.transaction&&tx.transaction.outputs)||[];
+  for(const o of outs){
+    const addr=o.script_public_key_address||(o.verbose_data&&o.verbose_data.script_public_key_address)||(o.scriptPublicKey&&o.scriptPublicKey.address)||'';
+    if(addr===MAKER_ADDR){
+      let amt=0n;try{amt=BigInt(o.amount!=null?o.amount:(o.value!=null?o.value:0));}catch(_){}
+      if(amt>=required)return true;
+    }
+  }
+  return false;
+}
+
+/* Deep-scan: walk ALL kw-2 manifests in a wallet's TX history and merge media
+   references (newer block_time wins per id). Used to recover missing dagIdx
+   that prior backups dropped, AND to populate recovery beyond the latest manifest.
+   Manifests that didn't pay the maker fee are silently filtered out. */
+async function _scanAllManifests(addr,onProgress,targetIds){
+  const apiBase='https://api.kaspa.org';
+  const refs=new Map();/* id → {idx, txs?, found:block_time} */
+  let primaryManifest=null;/* newest kw-1 or kw-2 with `d` field — for vault contents */
+  let offset=0;const PAGE=50;const MAX_SCAN=1000;
+  /* If targetIds is provided (deep-scan healing case), exit early once all are resolved */
+  const targetSet=targetIds&&targetIds.length?new Set(targetIds):null;
+  const allTargetsResolved=()=>{
+    if(!targetSet)return false;
+    for(const id of targetSet)if(!refs.has(id))return false;
+    return true;
+  };
+  while(offset<MAX_SCAN&&!allTargetsResolved()){
+    const listUrl=apiBase+'/addresses/'+addr+'/full-transactions?limit='+PAGE+'&offset='+offset+'&resolve_previous_outpoints=no';
+    let resp;try{resp=await fetch(listUrl);}catch(_){break;}
+    if(!resp.ok)break;
+    let txs;try{txs=await resp.json();}catch(_){break;}
+    if(!txs||!txs.length)break;
+    if(onProgress)onProgress(offset+txs.length);
+    for(const tx of txs){
+      const txId=tx.transaction_id||tx.id||'';
+      const blockTime=Number(tx.block_time||0);
+      let payload=tx.payload||(tx.transaction&&tx.transaction.payload)||(tx.verbose_data&&tx.verbose_data.payload)||'';
+      if(!payload&&txId){
+        try{
+          const tr=await fetch(apiBase+'/transactions/'+txId);
+          if(tr.ok){const td=await tr.json();payload=td.payload||(td.transaction&&td.transaction.payload)||'';}
+        }catch(_){}
+      }
+      if(!payload||payload.slice(0,2)!=='7b')continue;
+      let obj;try{obj=JSON.parse(hexToString(payload));}catch(_){continue;}
+      const isKw1=obj.t==='kw-1'&&obj.d;
+      const isKw2=obj.t==='kw-2'&&obj.d;
+      if(!isKw1&&!isKw2)continue;
+      if(!_verifyManifestFee(tx,isKw2))continue;
+      if(!primaryManifest||blockTime>primaryManifest.blockTime){
+        primaryManifest={obj,blockTime,txId};
+      }
+      if(isKw2&&Array.isArray(obj.media)){
+        for(const mf of obj.media){
+          if(!mf||!mf.id)continue;
+          const existing=refs.get(mf.id);
+          if(!existing||blockTime>existing.found){
+            refs.set(mf.id,{idx:mf.idx||null,txs:Array.isArray(mf.txs)?mf.txs:null,found:blockTime});
+          }
+        }
+      }
+    }
+    offset+=txs.length;
+    if(txs.length<PAGE)break;
+  }
+  return{refs,primaryManifest};
+}
+async function prefetchMedia(){
+  if(_prefetchRunning)return;
+  _prefetchRunning=true;
+  try{
+    const candidates=vault.filter(e=>e.type==='media'&&e.dagChunks&&e.dagChunks.length);
+    /* Filter to entries not already cached in IDB — saves time, no re-fetch loops */
+    const todo=[];
+    for(const e of candidates){const existing=await getMediaIDB(e.id);if(!existing)todo.push(e);}
+    if(!todo.length){_prefetchRunning=false;return;}
+    log('Background prefetch: '+todo.length+' media file(s)…');
+    let okCount=0,errCount=0;
+    /* Process up to 2 files in parallel — each one uses the 8-worker chunk pool
+       internally. Total concurrent fetches up to 16, much faster than sequential. */
+    const N_PARALLEL_FILES=2;
+    let idx=0;
+    const fileWorker=async()=>{
+      while(idx<todo.length&&_prefetchRunning){
+        /* Yield to the foreground viewer if a media modal is open */
+        while(_prefetchPaused){await new Promise(r=>setTimeout(r,500));if(!_prefetchRunning)return;}
+        const e=todo[idx++];
+        /* Skip files already cached (could have been fetched by foreground while we waited) */
+        try{const cached=await getMediaIDB(e.id);if(cached){okCount++;continue;}}catch(_){}
+        try{
+          const fullHex=await _fetchChunksParallel(e.dagChunks);
+          if(fullHex.length>0){
+            const encBuf=hexToBuf(fullHex);
+            await saveMediaIDB(e.id,encBuf);
+            log('Prefetched: '+esc(e.name)+' ('+fmtBytes(encBuf.byteLength)+')');
+            okCount++;
+          }
+        }catch(pe){
+          log('Prefetch error for "'+esc(e.name)+'": '+String(pe).slice(0,100));
+          errCount++;
+        }
+      }
+    };
+    await Promise.all(Array.from({length:N_PARALLEL_FILES},()=>fileWorker()));
+    log('Background prefetch complete: '+okCount+' ok'+(errCount>0?', '+errCount+' failed':''));
+  }finally{_prefetchRunning=false;}
+}
+
+/* Light refresh — cancels any running prefetch and starts fresh. Re-fetches
+   chunks for any media not yet in the IDB cache, with toast feedback. */
+window.refreshMissingMedia=async function(){
+  if(!vault||!vault.length){toast('Vault empty',false);return;}
+  const candidates=vault.filter(e=>e.type==='media'&&e.dagChunks&&e.dagChunks.length);
+  if(!candidates.length){toast('No media to refresh',false);return;}
+  /* Cancel any running prefetch so a fresh pass can start immediately */
+  if(_prefetchRunning){_prefetchRunning=false;await new Promise(r=>setTimeout(r,400));}
+  showStatus('Checking which media need refresh…');
+  const todo=[];
+  for(const e of candidates){const existing=await getMediaIDB(e.id);if(!existing)todo.push(e);}
+  if(!todo.length){toast('All media already cached.',false);showStatus('All media cached.');return;}
+  toast('Refreshing '+todo.length+' media file(s)…',false);
+  await prefetchMedia();
+  let cached=0;for(const e of candidates){const existing=await getMediaIDB(e.id);if(existing)cached++;}
+  const stillMissing=candidates.length-cached;
+  if(stillMissing===0){toast('All '+candidates.length+' media file(s) cached.',false);showStatus('Refresh complete.');}
+  else{toast('Refresh: '+cached+'/'+candidates.length+' cached, '+stillMissing+' still missing — open an entry directly to retry.',true);showStatus('Refresh: '+stillMissing+' file(s) still missing.');}
+};
+
 /* ═══ RENDER ═══ */
 function renderVault(){
   const filtered=currentFilter==='all'?vault:vault.filter(e=>e.type===currentFilter);
@@ -672,19 +1159,21 @@ function renderVault(){
   if(!filtered.length){el.innerHTML='<div class="empty-state">No entries'+(currentFilter!=='all'?' in this category':'') +'. Add your first.</div>';updateCounts();return;}
   el.innerHTML=filtered.map(e=>`
     <div class="entry-card" onclick="viewEntry('${esc(e.id)}')">
-      <div class="e-type">${typeIcon(e.type)} ${e.type}</div>
+      <div class="e-type">${typeIcon(e.type)} ${esc(e.type)}</div>
       <div class="e-name">${esc(e.name)}</div>
       ${e.user?'<div class="e-user">'+esc(e.user)+'</div>':''}
+      ${e.type==='media'&&e.filename?'<div class="e-user">'+esc(e.filename)+' · '+fmtBytes(e.size||0)+'</div>':''}
       <div class="e-date">Added ${new Date(e.created).toLocaleDateString()}</div>
     </div>
   `).join('');
   updateCounts();
 }
-function typeIcon(t){return{password:'🔑',note:'📝',seed:'🌱',id:'🪪'}[t]||'🔐';}
+function typeIcon(t){return{password:'🔑',note:'📝',seed:'🌱',id:'🪪',media:'🗂'}[t]||'🔐';}
+function fmtBytes(b){if(b<1024)return b+'B';if(b<1048576)return(b/1024).toFixed(1)+'KB';return(b/1048576).toFixed(1)+'MB';}
 function updateCounts(){
   $('cnt-all').textContent=vault.length;
-  ['password','note','seed','id'].forEach(t=>{
-    $('cnt-'+t).textContent=vault.filter(e=>e.type===t).length;
+  ['password','note','seed','id','media'].forEach(t=>{
+    const el=$('cnt-'+t);if(el)el.textContent=vault.filter(e=>e.type===t).length;
   });
 }
 function esc(s){return String(s||'').replace(/[<>&"']/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;'}[c]));}
@@ -698,11 +1187,31 @@ window.filterCat=function(cat,btn){
 };
 
 /* ═══ ADD/EDIT ═══ */
+window.handleMediaFile=function(file){
+  if(!file)return;
+  const _kwMimes=new Set(['image/png','image/jpeg','image/jpg','image/gif','image/webp','video/mp4','video/webm','audio/mpeg','audio/mp3','audio/ogg','audio/wav']);
+  if(!_kwMimes.has(file.type)){toast('Unsupported file type. Use images, video, or audio.',true);return;}
+  if(file.size>MAX_FILE_SIZE){toast('File too large. Max 3 MB per file.',true);return;}
+  const existingMedia=vault.filter(e=>e.type==='media'&&e.id!==editingId).reduce((s,e)=>s+(e.size||0),0);
+  if(existingMedia+file.size>MAX_TOTAL_MEDIA){toast('Total media limit reached (15 MB). Delete some media entries first.',true);return;}
+  pendingMediaFile=file;
+  $('media-thumb-wrap').style.display='none';
+  if(file.type.startsWith('image/')){
+    const url=_trackBlob(URL.createObjectURL(file));
+    $('media-thumb').src=url;$('media-thumb-wrap').style.display='block';
+  }
+  $('media-drop').querySelector('.md-label').textContent=file.name;
+  $('media-drop').querySelector('.md-icon').textContent='✅';
+  $('mi-size').textContent=fmtBytes(file.size)+' · '+file.type;
+  if(!$('f-name').value.trim())$('f-name').value=file.name.replace(/\.[^.]+$/,'');
+};
 window.openAdd=function(){
-  editingId=null;
+  editingId=null;pendingMediaFile=null;
   $('modal-title').textContent='Add entry';
   $('f-type').value='password';$('f-name').value='';$('f-user').value='';$('f-pass').value='';$('f-url').value='';$('f-content').value='';$('f-doctype').value='';$('f-docnum').value='';$('f-docexp').value='';$('f-notes').value='';
   $('btn-delete').style.display='none';
+  $('media-thumb-wrap').style.display='none';
+  const md=$('media-drop');if(md){md.querySelector('.md-label').textContent='Drop a file or click to browse';md.querySelector('.md-icon').textContent='📁';}
   toggleFields();
   $('modal-add').classList.add('show');
 };
@@ -711,40 +1220,63 @@ window.toggleFields=function(){
   document.querySelectorAll('.f-pw').forEach(el=>el.style.display=t==='password'?'block':'none');
   document.querySelectorAll('.f-note').forEach(el=>el.style.display=(t==='note'||t==='seed')?'block':'none');
   document.querySelectorAll('.f-id').forEach(el=>el.style.display=t==='id'?'block':'none');
+  document.querySelectorAll('.f-media').forEach(el=>el.style.display=t==='media'?'block':'none');
+  if(t!=='media'){pendingMediaFile=null;$('media-thumb-wrap').style.display='none';const md=$('media-drop');if(md){md.querySelector('.md-label').textContent='Drop a file or click to browse';md.querySelector('.md-icon').textContent='📁';}}
 };
-window.saveEntry=function(){
+window.saveEntry=async function(){
   const type=$('f-type').value;
   const name=$('f-name').value.trim();
   if(!name){alert('Name is required');return;}
-  const entry={
-    id:editingId||crypto.randomUUID(),
-    type,name,
-    user:$('f-user').value.trim(),
-    pass:$('f-pass').value,
-    url:$('f-url').value.trim(),
-    content:$('f-content').value,
-    doctype:$('f-doctype').value.trim(),
-    docnum:$('f-docnum').value.trim(),
-    docexp:$('f-docexp').value,
-    notes:$('f-notes').value,
-    created:editingId?vault.find(e=>e.id===editingId)?.created:Date.now(),
-    modified:Date.now()
-  };
+  const existing=editingId?vault.find(e=>e.id===editingId):null;
+  /* Spread the existing entry first so any field outside the form (dagChunks,
+     dagIdx, or future fields) survives an edit by default. Form fields overlay
+     on top — rebuilding from scratch would silently drop those references. */
+  const entry=existing?{...existing}:{id:crypto.randomUUID(),created:Date.now()};
+  entry.type=type;
+  entry.name=name;
+  entry.user=$('f-user').value.trim();
+  entry.pass=$('f-pass').value;
+  entry.url=$('f-url').value.trim();
+  entry.content=$('f-content').value;
+  entry.doctype=$('f-doctype').value.trim();
+  entry.docnum=$('f-docnum').value.trim();
+  entry.docexp=$('f-docexp').value;
+  entry.notes=$('f-notes').value;
+  entry.modified=Date.now();
+  /* Media file: encrypt bytes → IndexedDB. New bytes invalidate old DAG refs. */
+  if(type==='media'&&pendingMediaFile){
+    const btn=document.querySelector('.m-save');
+    try{
+      btn.textContent='Encrypting…';btn.disabled=true;
+      const ab=await pendingMediaFile.arrayBuffer();
+      const encBuf=await encryptBytes(ab,masterPass);
+      await saveMediaIDB(entry.id,encBuf);
+      entry.mime=pendingMediaFile.type||'application/octet-stream';
+      entry.size=pendingMediaFile.size;
+      entry.filename=pendingMediaFile.name;
+      delete entry.dagChunks;delete entry.dagIdx;
+      log('Media encrypted: '+entry.filename+' ('+fmtBytes(entry.size)+')');
+    }catch(err){alert('Failed to encrypt file: '+String(err));btn.textContent='Encrypt & Save';btn.disabled=false;return;}
+    btn.textContent='Encrypt & Save';btn.disabled=false;
+  }
+  pendingMediaFile=null;
   if(editingId){vault=vault.map(e=>e.id===editingId?entry:e);}
   else{vault.push(entry);}
   saveVaultLocal();
   closeModal('modal-add');
   renderVault();
 };
-window.deleteEntry=function(){
+window.deleteEntry=async function(){
   if(!editingId)return;
   if(!confirm('Delete this entry permanently?'))return;
+  const entry=vault.find(e=>e.id===editingId);
+  if(entry&&entry.type==='media'){try{await deleteMediaIDB(editingId);}catch(_){}}
   vault=vault.filter(e=>e.id!==editingId);
   saveVaultLocal();
   closeModal('modal-add');
   renderVault();
 };
-window.closeModal=function(id){$(id).classList.remove('show');if(id==='modal-view'){for(const k in cpData)delete cpData[k];}};
+window.closeModal=function(id){$(id).classList.remove('show');if(id==='modal-view'){for(const k in cpData)delete cpData[k];_revokeAllBlobs();_prefetchPaused=false;}};
 
 /* ═══ VIEW ═══ */
 window.viewEntry=function(id){
@@ -764,12 +1296,74 @@ window.viewEntry=function(id){
     html+=viewRow('Document type',e.doctype,false);
     html+=viewRow('Number',e.docnum,true);
     if(e.docexp)html+=viewRow('Expiry',e.docexp,false);
+  }else if(e.type==='media'){
+    html+=viewRow('Filename',e.filename||'unknown',false);
+    html+=viewRow('Size',fmtBytes(e.size||0),false);
+    html+=viewRow('Type',e.mime||'unknown',false);
+    html+='<div id="media-view-area" style="margin:16px 0;text-align:center"><div style="font-family:var(--geo);font-size:11px;color:var(--t3)">Decrypting…</div></div>';
+    html+='<div class="media-warn">Media files are encrypted and backed up to the Kaspa DAG with the 10 KAS media backup tier. Recoverable from any device.</div>';
   }
   if(e.notes)html+=viewRow('Notes',e.notes,false);
   html+=viewRow('Created',new Date(e.created).toLocaleString(),false);
   if(e.modified!==e.created)html+=viewRow('Modified',new Date(e.modified).toLocaleString(),false);
   $('view-body').innerHTML=html;
   $('modal-view').classList.add('show');
+  /* Async: decrypt and render media preview */
+  if(e.type==='media'){
+    _loadMediaIntoView(id);
+  }
+};
+/* Reusable media loader — called from viewEntry initially and from the in-modal
+   Retry button. Stays inside the open modal, no need to close and re-enter the
+   master password. Keeps the encrypted vault state intact. */
+window._loadMediaIntoView=async function(id){
+  const e=vault.find(v=>v.id===id);
+  if(!e)return;
+  const area=$('media-view-area');
+  if(!area)return;
+  area.innerHTML='<div style="font-family:var(--geo);font-size:11px;color:var(--t3)">Loading…</div>';
+  /* Foreground priority: pause background prefetch while this view loads */
+  _prefetchPaused=true;
+  try{
+    let encBuf=await getMediaIDB(id);
+    if(!encBuf&&e.dagChunks&&e.dagChunks.length){
+      area.innerHTML='<div style="font-family:var(--geo);font-size:12px;color:var(--kas)">Reading from DAG… 0/'+e.dagChunks.length+'</div>';
+      try{
+        const fullHex=await _fetchChunksParallel(e.dagChunks,(done,t,lastErr)=>{
+          const hint=(done===0&&lastErr)?' <span style="color:var(--amb);font-size:10px">(retrying — '+esc(lastErr)+')</span>':'';
+          area.innerHTML='<div style="font-family:var(--geo);font-size:12px;color:var(--kas)">Reading from DAG… '+done+'/'+t+hint+'</div>';
+        });
+        encBuf=hexToBuf(fullHex);
+        try{await saveMediaIDB(id,encBuf);}catch(_){}
+      }catch(fe){
+        area.innerHTML='<div style="font-family:var(--geo);font-size:12px;color:var(--red);text-align:center">Failed to load from DAG.<br><span style="font-size:11px;color:var(--t3)">'+esc(String(fe).slice(0,120))+'</span><br><button onclick="_loadMediaIntoView(\''+esc(id)+'\')" style="margin-top:12px;padding:8px 20px;font-family:var(--geo);font-size:11px;background:var(--kas);color:var(--bg);border:none;cursor:pointer;text-transform:uppercase;letter-spacing:1px">↻ Retry</button></div>';
+        _prefetchPaused=false;return;
+      }
+    }
+    if(!encBuf){
+      area.innerHTML='<div style="font-family:var(--geo);font-size:12px;color:var(--red);text-align:center">No media data available.<br><span style="font-size:11px;color:var(--t3)">No local copy and no DAG reference. Try "Re-link DAG videos" in the wallet bar.</span></div>';return;
+    }
+    area.innerHTML='<div style="font-family:var(--geo);font-size:12px;color:var(--kas)">Decrypting…</div>';
+    const decBuf=await decryptBytes(encBuf,masterPass);
+    const mime=e.mime||'application/octet-stream';
+    const blob=new Blob([decBuf],{type:mime});
+    const url=_trackBlob(URL.createObjectURL(blob));
+    if(mime.startsWith('image/')){
+      area.innerHTML='<img src="'+url+'" class="media-modal-preview" alt="'+esc(e.filename||e.name)+'"/>';
+    }else if(mime.startsWith('video/')){
+      area.innerHTML='<video src="'+url+'" controls class="media-modal-player"></video>';
+    }else if(mime.startsWith('audio/')){
+      area.innerHTML='<audio src="'+url+'" controls class="media-modal-player"></audio>';
+    }else{
+      area.innerHTML='<a href="'+url+'" download="'+esc(e.filename||e.name)+'" style="font-family:var(--geo);font-size:13px;color:var(--kas);text-decoration:none;padding:12px;background:var(--bg);border:1px solid var(--bdr);display:inline-block;margin-top:8px">Download '+esc(e.filename||e.name)+'</a>';
+    }
+  }catch(err){
+    area.innerHTML='<div style="font-family:var(--geo);font-size:12px;color:var(--red);text-align:center">Decryption failed: '+esc(String(err).slice(0,120))+'<br><button onclick="_loadMediaIntoView(\''+esc(id)+'\')" style="margin-top:12px;padding:8px 20px;font-family:var(--geo);font-size:11px;background:var(--kas);color:var(--bg);border:none;cursor:pointer;text-transform:uppercase;letter-spacing:1px">↻ Retry</button></div>';
+  }finally{
+    /* Release prefetch pause when this view's load finishes (success or fail).
+       Modal stays open but background prefetch can resume in the background. */
+    _prefetchPaused=false;
+  }
 };
 function viewRow(label,val,sensitive){
   const id='cp-'+Math.random().toString(36).slice(2,8);
@@ -785,11 +1379,14 @@ window.editFromView=function(){
   $('modal-title').textContent='Edit entry';
   $('f-type').value=e.type;$('f-name').value=e.name;$('f-user').value=e.user||'';$('f-pass').value=e.pass||'';$('f-url').value=e.url||'';$('f-content').value=e.content||'';$('f-doctype').value=e.doctype||'';$('f-docnum').value=e.docnum||'';$('f-docexp').value=e.docexp||'';$('f-notes').value=e.notes||'';
   $('btn-delete').style.display='block';
+  if(e.type==='media'&&e.filename){
+    const md=$('media-drop');if(md){md.querySelector('.md-label').textContent=e.filename+' ('+fmtBytes(e.size||0)+')';md.querySelector('.md-icon').textContent='✅';}
+  }
   toggleFields();
   $('modal-add').classList.add('show');
 };
 
-/* ═══ WALLET + CHAIN BACKUP ═══ */
+/* ═══ WALLET + DAG BACKUP ═══ */
 function initWallet(){
   let saved=localStorage.getItem('kassword_pk');
   if(!saved){const kb=crypto.getRandomValues(new Uint8Array(32));saved=Array.from(kb).map(b=>b.toString(16).padStart(2,'0')).join('');localStorage.setItem('kassword_pk',saved);log('New wallet generated');}
@@ -809,45 +1406,444 @@ window.refreshBalance=async function(){
   try{const{entries}=await rpc.getUtxosByAddresses([address.toString()]);let total=0n;for(const e of entries)total+=e.amount;const kas=Number(total)/100000000;$('w-bal').textContent=kas.toFixed(8)+' KAS';}catch(e){$('w-bal').textContent='error';}
 };
 
+/* ═══ CHUNKED MEDIA UPLOAD ═══ */
+function bufToHex(buf){return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');}
+function hexToBuf(hex){const a=new Uint8Array(hex.length/2);for(let i=0;i<hex.length;i+=2)a[i/2]=parseInt(hex.substr(i,2),16);return a.buffer;}
+
+/* Derive a chunk worker key from main wallet — deterministic per index,
+   re-derivable, never stored. Same SHA256-marker pattern as the proven shard pool. */
+async function deriveChunkWorker(index){
+  const mainHex=localStorage.getItem('kassword_pk');
+  if(!mainHex||mainHex.length!==64)throw new Error('Wallet not loaded');
+  const data=new TextEncoder().encode(mainHex+':kw-chunk-worker:'+index);
+  const hash=await crypto.subtle.digest('SHA-256',data);
+  const hex=Array.from(new Uint8Array(hash)).map(b=>b.toString(16).padStart(2,'0')).join('');
+  const wPk=new kaspa.PrivateKey(hex);
+  return{pk:wPk,addr:wPk.toKeypair().toAddress('mainnet')};
+}
+
+/* Build virtual UTXOs from a TX's outputs — address taken from explicit outputs[],
+   change outputs fall back to changeAddr. Mirrors the proven sendTxChain pattern. */
+function virtualUtxos(tx,outputs,changeAddr){
+  const txId=tx.id;const obj=tx.serializeToObject();
+  return obj.outputs.map((o,i)=>({
+    address:(outputs[i]&&outputs[i].address)||changeAddr,
+    outpoint:{transactionId:txId,index:i},
+    utxoEntry:{amount:BigInt(o.value),scriptPublicKey:o.scriptPublicKey,blockDaaScore:0xFFFFFFFFFFFFFFFFn,isCoinbase:false}
+  }));
+}
+
+/* Send chunk TX, return virtual UTXOs for chaining.
+   Data hitting the DAG is ALREADY AES-256-GCM encrypted (encryptBytes output). */
+async function sendChunkTx(chunkHex,curEntries,addr,rpcRef,pkRef){
+  const result=await kaspa.createTransactions({networkId:'mainnet',entries:curEntries,outputs:[],priorityFee:50000n,changeAddress:addr});
+  for(let ti=0;ti<result.transactions.length-1;ti++){
+    const ptx=result.transactions[ti].transaction;
+    kaspa.signTransaction(ptx,[pkRef],true);ptx.finalize();
+    await rpcRef.submitTransaction({transaction:ptx,allowOrphan:false});
+  }
+  const p=result.transactions[result.transactions.length-1];
+  const tx=p.transaction;tx.payload=chunkHex;
+  kaspa.signTransaction(tx,[pkRef],true);tx.finalize();
+  await rpcRef.submitTransaction({transaction:tx,allowOrphan:false});
+  return{txId:tx.id,nextEntries:virtualUtxos(tx,[],addr)};
+}
+
+/* Submit a simple TX (outputs + fee), return virtual UTXOs.
+   changeAddr is where change goes; outputs[] addresses are honored on virtual UTXOs. */
+async function submitTx(entries,outputs,fee,changeAddr,rpcRef,pkRef,payload){
+  const result=await kaspa.createTransactions({networkId:'mainnet',entries,outputs,priorityFee:fee,changeAddress:changeAddr});
+  for(let ti=0;ti<result.transactions.length-1;ti++){
+    const ptx=result.transactions[ti].transaction;
+    kaspa.signTransaction(ptx,[pkRef],true);ptx.finalize();
+    await rpcRef.submitTransaction({transaction:ptx,allowOrphan:false});
+  }
+  const last=result.transactions[result.transactions.length-1];
+  const tx=last.transaction;
+  if(payload)tx.payload=payload;
+  kaspa.signTransaction(tx,[pkRef],true);tx.finalize();
+  await rpcRef.submitTransaction({transaction:tx,allowOrphan:false});
+  return{txId:tx.id,nextEntries:virtualUtxos(tx,outputs,changeAddr)};
+}
+
+let _backupInFlight=false;
 window.backupToChain=async function(){
+  if(_backupInFlight){toast('Backup already running — wait for it to finish.',true);return;}
   if(!rpc){showStatus('Not connected to network');return;}
   if(!vault.length){showStatus('Vault is empty');return;}
-  showStatus('Encrypting vault for DAG backup...');
+  _backupInFlight=true;
+  const _backupBtn=document.querySelector('.wallet-bar button[onclick="backupToChain()"]');
+  if(_backupBtn){_backupBtn.disabled=true;_backupBtn.style.opacity='.5';_backupBtn.style.cursor='not-allowed';}
   try{
-    const vaultJson=JSON.stringify(vault);
-    const encrypted=await encrypt(vaultJson,masterPass);
-    /* Include salt in payload so recovery on another browser works */
+  const mediaEntries=vault.filter(e=>e.type==='media');
+  /* Trigger media-tier fee if any media entry has content (IDB bytes OR a prior
+     DAG reference). Checking IDB alone would misclassify after a cache wipe. */
+  let isMedia=false;
+  if(mediaEntries.length){
+    for(const me of mediaEntries){
+      if(me.dagIdx||(me.dagChunks&&me.dagChunks.length)){isMedia=true;break;}
+      const buf=await getMediaIDB(me.id);if(buf){isMedia=true;break;}
+    }
+  }
+  const makerFee=isMedia?BACKUP_FEE_MAKER_MEDIA:BACKUP_FEE_MAKER;
+  const minerFee=isMedia?BACKUP_FEE_MINERS_MEDIA:BACKUP_FEE_MINERS;
+  const totalFee=makerFee+minerFee;
+  showStatus('Encrypting vault…');
+  try{
+    const vaultForBackup=vault.map(e=>{const{dagChunks,dagIdx,...rest}=e;return rest;});
+    const encrypted=await encrypt(JSON.stringify(vaultForBackup),masterPass);
     const saltHex=localStorage.getItem('kassword_salt')||'';
-    /* STEALTH PAYLOAD — no protocol name visible */
-    const payload=JSON.stringify({"t":"kw-1","v":2,"d":encrypted,"s":saltHex});
-    const payloadHex=Array.from(new TextEncoder().encode(payload)).map(b=>b.toString(16).padStart(2,'0')).join('');
-    const payloadBytes=payloadHex.length/2;
-    if(payloadBytes>16000){showStatus('Vault too large for single tx ('+payloadBytes+' bytes). Max ~16KB per backup.');return;}
     const addr=address.toString();
-    const{entries}=await rpc.getUtxosByAddresses([addr]);
-    if(!entries.length){showStatus('No funds. Send at least 5 KAS to your wallet.');return;}
-    let totalBal=0n;for(const u of entries)totalBal+=u.amount;
-    const needed=BACKUP_FEE_MAKER+BACKUP_FEE_MINERS;
-    if(totalBal<needed){showStatus('Need '+Number(needed/100000000n)+' KAS. You have '+Number(totalBal/100000000n)+' KAS.');return;}
-    log('Backup: balance '+(Number(totalBal)/100000000)+' KAS, need '+(Number(needed)/100000000)+' KAS');
-    /* MAINNET: 2 KAS to maker wallet */
-    const makerAddr=MAKER_ADDR;
-    const result=await kaspa.createTransactions({networkId:'mainnet',entries,outputs:[{address:makerAddr,amount:BACKUP_FEE_MAKER}],priorityFee:BACKUP_FEE_MINERS,changeAddress:addr});
-    for(const pending of result.transactions){
+
+    showStatus('Checking balance…');
+    let{entries:walletUtxos}=await rpc.getUtxosByAddresses([addr]);
+    if(!walletUtxos.length){showStatus('No funds. Send at least '+(isMedia?'10':'5')+' KAS.');return;}
+    let totalBal=0n;for(const u of walletUtxos)totalBal+=u.amount;
+    const needed=totalFee+(isMedia?100000000n:100000n);
+    if(totalBal<needed){showStatus('Need '+(Number(needed)/1e8)+' KAS, have '+(Number(totalBal)/1e8).toFixed(2)+' KAS.');return;}
+    log('Backup: '+(Number(totalBal)/1e8)+' KAS, need '+(Number(totalFee)/1e8)+(isMedia?' (media)':''));
+
+    let chunkManifest=[];
+    let manifestEntries=null;
+
+    if(isMedia){
+      /* Pre-flight deep-scan: walk every prior kw-2 manifest, restore any missing
+         dagIdx into local vault. Guarantees the new manifest references every
+         media entry that's ever been backed up (all-or-nothing semantics). */
+      const _missingPre=mediaEntries.filter(e=>!e.dagIdx).map(e=>e.id);
+      if(_missingPre.length){
+      showStatus('Scanning prior manifests…');
       try{
-        const tx=pending.transaction;tx.payload=payloadHex;
-        kaspa.signTransaction(tx,[privateKey],true);
-        tx.finalize();
-        await rpc.submitTransaction({transaction:tx,allowOrphan:false});
-        log('Vault backed up to DAG! TX: '+tx.id);
-        showStatus('Vault backed up to Kaspa DAG. TX: '+tx.id.slice(0,16)+'...');
-        return;
-      }catch(ea){log('Path A: '+String(ea));}
-      await pending.sign([privateKey]);const txId=await pending.submit(rpc);
-      log('Vault backup (no payload): '+txId);
-      showStatus('Backup sent (no payload fallback)');
+        const{refs:priorRefs}=await _scanAllManifests(addr,null,_missingPre);
+        let healed=0;
+        for(const me of mediaEntries){
+          if(me.dagIdx)continue;
+          const ref=priorRefs.get(me.id);
+          if(ref&&ref.idx){me.dagIdx=ref.idx;healed++;}
+          if(ref&&ref.txs&&!me.dagChunks)me.dagChunks=ref.txs;
+        }
+        if(healed>0){saveVaultLocal();log('Pre-flight: restored '+healed+' missing DAG ref(s) from prior manifests');}
+      }catch(scanErr){log('Pre-flight scan failed (continuing): '+scanErr);}
+      }
+
+      /* Plan upload: classify every media entry. Each one must end up in
+         chunkManifest, otherwise the new manifest would forget it. */
+      const items=[];
+      let freshChunks=0;
+      const droppable=[];/* entries we genuinely cannot back up */
+      for(const me of mediaEntries){
+        if(me.dagIdx){
+          /* Already in DAG. Push existing reference, no upload. */
+          chunkManifest.push({id:me.id,idx:me.dagIdx});
+          log('Skip "'+esc(me.name)+'": already in DAG (idx '+me.dagIdx.slice(0,12)+'…)');
+          continue;
+        }
+        const encBuf=await getMediaIDB(me.id);
+        if(me.dagChunks&&me.dagChunks.length){
+          /* Legacy v1: chunks but no index. Migrate (1 TX). */
+          items.push({me,encBuf,action:'migrate'});
+          continue;
+        }
+        if(encBuf){
+          /* Fresh upload from local bytes. */
+          const hex=bufToHex(encBuf);
+          const numChunks=Math.ceil(hex.length/(CHUNK_RAW*2));
+          items.push({me,encBuf,action:'fresh',hex,numChunks});
+          freshChunks+=numChunks;
+          continue;
+        }
+        /* No DAG ref AND no local bytes — entry is unrecoverable. Collect for abort. */
+        droppable.push(me);
+      }
+      if(droppable.length){
+        const names=droppable.map(m=>'"'+m.name+'"').join(', ');
+        const msg='Cannot back up: '+droppable.length+' media entr(y/ies) have no local bytes and no DAG reference: '+names+'. Delete them or re-add the file(s) before backing up.';
+        log('ABORT: '+msg);showStatus(msg.slice(0,120));toast(msg.slice(0,180),true);return;
+      }
+
+      /* Pre-split: N parallel workers + change to main as manifest reserve.
+         KIP-9 mass: each worker output ≥ 1 KAS keeps storage mass < 10K per output.
+         N+1 outputs total (N workers + change). Cap N at 6. Only the worker outputs
+         are explicit; change auto-flows to main, avoiding any dust output that would
+         blow up storage mass (10^12 / output_amount). */
+      const manifestReserve=totalFee+30000000n;
+      const chunkBudgetTotal=totalBal-manifestReserve-100000n;
+      if(chunkBudgetTotal<100000000n&&freshChunks>0)throw new Error('Chunk budget too small ('+(Number(chunkBudgetTotal)/1e8).toFixed(2)+' KAS)');
+      const minFundPerWorker=100000000n;/* 1 KAS — KIP-9 safety floor (mass = 10K) */
+      let NUM_WORKERS=freshChunks>0?Math.min(6,Math.max(1,Math.ceil(freshChunks/50))):1;
+      while(NUM_WORKERS>1&&chunkBudgetTotal/BigInt(NUM_WORKERS)<minFundPerWorker)NUM_WORKERS--;
+      const fundPerWorker=chunkBudgetTotal/BigInt(NUM_WORKERS);
+
+      showStatus('Preparing '+NUM_WORKERS+' worker(s)…');
+      const workers=[];
+      for(let wi=0;wi<NUM_WORKERS;wi++)workers.push(await deriveChunkWorker(wi));
+      const splitOutputs=workers.map(w=>({address:w.addr.toString(),amount:fundPerWorker}));
+      log('Pre-split: '+NUM_WORKERS+' worker(s) × '+(Number(fundPerWorker)/1e8).toFixed(4)+' KAS, manifest≈'+(Number(manifestReserve)/1e8).toFixed(2)+' KAS (auto-change)');
+      const splitR=await submitTx(walletUtxos,splitOutputs,50000n,addr,rpc,privateKey,null);
+
+      /* Map outputs to workers/manifest by address */
+      manifestEntries=[];
+      const workerEntries=workers.map(()=>[]);
+      for(const e of splitR.nextEntries){
+        const eAddr=(e.address&&typeof e.address==='object')?e.address.toString():String(e.address||'');
+        let matched=false;
+        for(let wi=0;wi<workers.length;wi++){
+          if(workers[wi].addr.toString()===eAddr){workerEntries[wi].push(e);matched=true;break;}
+        }
+        if(!matched)manifestEntries.push(e);
+      }
+      for(let wi=0;wi<workers.length;wi++){if(!workerEntries[wi].length)throw new Error('Worker '+wi+' got no UTXO from pre-split');}
+      if(!manifestEntries.length)throw new Error('Pre-split produced no manifest change UTXO');
+      let mBal=0n;for(const e of manifestEntries)mBal+=e.utxoEntry.amount;
+      log(NUM_WORKERS+' worker(s) funded · manifest reserve '+(Number(mBal)/1e8).toFixed(4)+' KAS');
+
+      /* ── MIGRATIONS: send index TX from main wallet (sequential, fast) ── */
+      let mfChain=manifestEntries;
+      for(const item of items.filter(i=>i.action==='migrate')){
+        const{me}=item;
+        log('Migrating "'+esc(me.name)+'": index TX from '+me.dagChunks.length+' existing chunks');
+        const migHex=Array.from(new TextEncoder().encode(JSON.stringify({"t":"kw-2i","id":me.id,"txs":me.dagChunks}))).map(b=>b.toString(16).padStart(2,'0')).join('');
+        try{
+          const r=await sendChunkTx(migHex,mfChain,addr,rpc,privateKey);
+          mfChain=r.nextEntries;me.dagIdx=r.txId;saveVaultLocal();
+          log('Migrated "'+esc(me.name)+'": index '+r.txId.slice(0,12));
+          chunkManifest.push({id:me.id,idx:r.txId});
+        }catch(mie){log('Migration failed: '+mie+' — will re-upload');}
+      }
+
+      /* ── FRESH UPLOADS: parallel chunk distribution across workers ── */
+      const freshItems=items.filter(i=>i.action==='fresh');
+      if(freshItems.length){
+        /* Distribute each file's chunks contiguously across workers (preserves order). */
+        const tasksByWorker=workers.map(()=>[]);
+        for(const item of freshItems){
+          const{me,hex,numChunks}=item;
+          const baseSize=Math.floor(numChunks/NUM_WORKERS);
+          const remainder=numChunks%NUM_WORKERS;
+          let pos=0;
+          for(let wi=0;wi<NUM_WORKERS;wi++){
+            const sliceSize=baseSize+(wi<remainder?1:0);
+            for(let ci=pos;ci<pos+sliceSize;ci++){
+              const start=ci*CHUNK_RAW*2;
+              const chunkHex=hex.slice(start,Math.min(start+CHUNK_RAW*2,hex.length));
+              tasksByWorker[wi].push({mediaId:me.id,chunkIdx:ci,hex:chunkHex});
+            }
+            pos+=sliceSize;
+          }
+        }
+
+        log('Uploading '+freshChunks+' chunk(s) across '+NUM_WORKERS+' worker(s) in parallel…');
+        let progress=0;
+        const progressInterval=setInterval(()=>{showStatus('Chunks: '+progress+'/'+freshChunks);},400);
+        const txIdsByFile={};
+        let parallelErr=null;
+        try{
+          await Promise.all(workers.map(async(w,wi)=>{
+            const wAddr=w.addr.toString();
+            let cur=workerEntries[wi];
+            for(const task of tasksByWorker[wi]){
+              try{
+                const r=await sendChunkTx(task.hex,cur,wAddr,rpc,w.pk);
+                cur=r.nextEntries;
+                if(!txIdsByFile[task.mediaId])txIdsByFile[task.mediaId]={};
+                txIdsByFile[task.mediaId][task.chunkIdx]=r.txId;
+                progress++;
+              }catch(ce){
+                if(!parallelErr)parallelErr='Worker '+wi+' chunk '+task.chunkIdx+': '+String(ce).slice(0,80);
+                throw ce;
+              }
+            }
+            workerEntries[wi]=cur;
+          }));
+        }catch(_){
+        }finally{clearInterval(progressInterval);}
+        if(parallelErr){
+          log('Parallel upload aborted: '+parallelErr);
+          showStatus('Chunk upload failed: '+parallelErr.slice(0,60));
+          toast('Upload failed. Use Recover worker funds, then retry.',true);return;
+        }
+        log('All '+freshChunks+' chunk(s) uploaded · '+progress+'/'+freshChunks);
+
+        /* Send index TX per file from main wallet, in order */
+        for(const item of freshItems){
+          const{me,numChunks}=item;
+          const txIds=[];
+          for(let ci=0;ci<numChunks;ci++)txIds.push(txIdsByFile[me.id][ci]);
+          showStatus('Index for '+me.name+'…');
+          const idxHex=Array.from(new TextEncoder().encode(JSON.stringify({"t":"kw-2i","id":me.id,"txs":txIds}))).map(b=>b.toString(16).padStart(2,'0')).join('');
+          try{
+            const r=await sendChunkTx(idxHex,mfChain,addr,rpc,privateKey);
+            mfChain=r.nextEntries;me.dagChunks=txIds;me.dagIdx=r.txId;saveVaultLocal();
+            log('Index TX for "'+me.name+'": '+r.txId.slice(0,12));
+            chunkManifest.push({id:me.id,idx:r.txId});
+          }catch(ie){
+            log('Index TX FAILED: '+ie);showStatus('Index TX failed.');
+            toast('Backup failed at index TX. Chunks are in DAG — retry will reuse them.',true);return;
+          }
+        }
+      }
+
+      /* ── PARALLEL SWEEPS: each worker returns remainder to main wallet.
+         outputs:[] + priorityFee:50000n → SDK creates ONE clean change output to main.
+         No dust, no KIP-9 mass blowup. */
+      showStatus('Sweeping workers…');
+      await Promise.all(workers.map(async(w,wi)=>{
+        try{
+          let wBal=0n;for(const e of workerEntries[wi])wBal+=e.utxoEntry.amount;
+          if(wBal>100000n){
+            const sR=await submitTx(workerEntries[wi],[],50000n,addr,rpc,w.pk,null);
+            log('Worker '+wi+' swept '+(Number(wBal)/1e8).toFixed(4)+' KAS back · sweep tx '+sR.txId.slice(0,12));
+          }
+        }catch(se){log('Worker '+wi+' sweep failed (use Recover worker funds): '+se);}
+      }));
+
+      manifestEntries=mfChain;
+    }
+
+    /* Build manifest payload */
+    const payloadObj=isMedia
+      ?{"t":"kw-2","v":2,"d":encrypted,"s":saltHex,"media":chunkManifest}
+      :{"t":"kw-1","v":2,"d":encrypted,"s":saltHex};
+    const payloadHex=Array.from(new TextEncoder().encode(JSON.stringify(payloadObj))).map(b=>b.toString(16).padStart(2,'0')).join('');
+    if(payloadHex.length/2>16000){showStatus('Manifest too large ('+Math.round(payloadHex.length/2)+' bytes).');return;}
+
+    /* ── SEND MANIFEST TX from reserved main-wallet UTXO ── */
+    showStatus('Finalizing backup…');
+    let manifestOk=false;
+    const mEntries=manifestEntries||walletUtxos;
+
+    /* Attempt 1: reserved manifest UTXO (depth-1 virtual, or real for text-only) */
+    try{
+      let mBal=0n;for(const e of mEntries)mBal+=(e.utxoEntry?e.utxoEntry.amount:e.amount);
+      log('Manifest attempt 1: '+(Number(mBal)/1e8).toFixed(4)+' KAS');
+      const r=await submitTx(mEntries,[{address:MAKER_ADDR,amount:makerFee}],minerFee,addr,rpc,privateKey,payloadHex);
+      log('Backed up to DAG! TX: '+r.txId+(isMedia?' (kw-2, '+chunkManifest.length+' media)':''));
+      showStatus('Vault backed up to DAG.');manifestOk=true;saveVaultLocal();
+    }catch(ea){log('Manifest attempt 1 failed: '+ea);}
+
+    /* Attempt 2: send full fee as output (avoids large priorityFee SDK issue) */
+    if(!manifestOk){
+      try{
+        log('Manifest attempt 2 (combined output)…');
+        const r=await submitTx(mEntries,[{address:MAKER_ADDR,amount:totalFee}],100000n,addr,rpc,privateKey,payloadHex);
+        log('Backed up to DAG! TX: '+r.txId+(isMedia?' (kw-2, '+chunkManifest.length+' media)':''));
+        showStatus('Vault backed up to DAG.');manifestOk=true;saveVaultLocal();
+      }catch(ea){log('Manifest attempt 2 failed: '+ea);}
+    }
+
+    /* Attempt 3+: fresh confirmed UTXOs with progressive wait */
+    if(!manifestOk){
+      const waits=[15,30,45];
+      for(let ri=0;ri<waits.length&&!manifestOk;ri++){
+        log('Waiting '+waits[ri]+'s for confirmations…');
+        showStatus('Confirming… ('+waits[ri]+'s)');
+        await new Promise(r=>setTimeout(r,waits[ri]*1000));
+        try{
+          const{entries:freshE}=await rpc.getUtxosByAddresses([addr]);
+          let fb=0n;for(const e of freshE)fb+=e.amount;
+          log('Manifest retry '+(ri+1)+': '+freshE.length+' UTXOs, '+(Number(fb)/1e8).toFixed(4)+' KAS');
+          if(fb<totalFee+100000n){log('Balance too low, waiting…');continue;}
+          const r=await submitTx(freshE,[{address:MAKER_ADDR,amount:makerFee}],minerFee,addr,rpc,privateKey,payloadHex);
+          log('Backed up to DAG! TX: '+r.txId+(isMedia?' (kw-2, '+chunkManifest.length+' media)':''));
+          showStatus('Vault backed up to DAG.');manifestOk=true;saveVaultLocal();
+        }catch(ea){
+          log('Manifest retry '+(ri+1)+' failed: '+ea);
+          if(ri>=waits.length-1){showStatus('Manifest failed. Retry backup.');toast('Chunks in DAG — retry "Backup to DAG" for manifest.',true);}
+        }
+      }
     }
   }catch(e){log('Backup error: '+String(e));showStatus('Backup failed: '+String(e));}
+  }finally{
+    _backupInFlight=false;
+    if(_backupBtn){_backupBtn.disabled=false;_backupBtn.style.opacity='';_backupBtn.style.cursor='';}
+  }
+};
+
+/* Recover any funds stranded at the deterministic chunk-worker address.
+   Worker key = SHA256(walletKey + ':kw-chunk-worker:'+i) — re-derivable from the main
+   wallet at any time, never persisted. If a previous backup's worker sweep failed
+   silently (the v1 sweep had a dust-change KIP-9 trap), this scans worker indices
+   0..3, sweeps any UTXOs back to main. Single output, no dust. */
+/* Re-link missing DAG references: walk every prior kw-2 manifest in the wallet's
+   TX history and restore dagIdx + dagChunks for any media entry that's lost them.
+   Fixes "No media data available" without re-uploading or wiping browser data. */
+window.relinkMediaFromDag=async function(){
+  if(!address){toast('Wallet not loaded',true);return;}
+  const mediaEntries=vault.filter(e=>e.type==='media');
+  if(!mediaEntries.length){toast('No media entries in vault',false);return;}
+  const apiBase='https://api.kaspa.org';
+  showStatus('Scanning DAG history for media references…');
+  log('Re-link: scanning prior manifests…');
+  try{
+    const{refs}=await _scanAllManifests(address.toString(),(scanned)=>{showStatus('Scanned '+scanned+' transaction(s)…');});
+    let relinked=0;let chunksFetched=0;
+    for(const me of mediaEntries){
+      const ref=refs.get(me.id);
+      if(!ref||!ref.idx)continue;
+      const wasMissingIdx=!me.dagIdx;
+      const wasMissingChunks=!me.dagChunks||!me.dagChunks.length;
+      if(wasMissingIdx)me.dagIdx=ref.idx;
+      if(wasMissingChunks&&ref.txs&&ref.txs.length)me.dagChunks=ref.txs;
+      /* If we still don't have chunk list, fetch it from the index TX */
+      if((!me.dagChunks||!me.dagChunks.length)&&me.dagIdx){
+        try{
+          const ir=await fetch(apiBase+'/transactions/'+me.dagIdx);
+          if(ir.ok){
+            const id2=await ir.json();
+            let ip=id2.payload||'';if(!ip&&id2.transaction)ip=id2.transaction.payload||'';
+            if(ip){
+              const idxData=JSON.parse(hexToString(ip));
+              if(idxData.txs&&idxData.txs.length){me.dagChunks=idxData.txs;chunksFetched++;}
+            }
+          }
+        }catch(_){}
+      }
+      if(wasMissingIdx||wasMissingChunks){
+        relinked++;
+        log('Re-linked "'+esc(me.name)+'": idx '+me.dagIdx.slice(0,12)+'… · '+(me.dagChunks?me.dagChunks.length+' chunks':'no chunks'));
+      }
+    }
+    if(relinked>0){
+      saveVaultLocal();renderVault();
+      toast('Re-linked '+relinked+' media entr(y/ies). Try opening them now.',false);
+      showStatus('Re-link complete: '+relinked+' fixed'+(chunksFetched>0?', '+chunksFetched+' chunk list(s) fetched':''));
+    }else{
+      toast('All media entries already have DAG references.',false);
+      showStatus('Re-link: nothing to do.');
+    }
+  }catch(e){log('Re-link error: '+e);toast('Re-link error: '+String(e).slice(0,80),true);}
+};
+
+window.recoverWorkerFunds=async function(){
+  if(!rpc){toast('Not connected to network',true);return;}
+  if(!address){toast('Wallet not loaded',true);return;}
+  try{
+    const mainAddr=address.toString();
+    let totalRecovered=0n;let txsSubmitted=0;
+    /* Scan up to 6 worker indices — matches parallel-backup max NUM_WORKERS cap */
+    for(let idx=0;idx<6;idx++){
+      const worker=await deriveChunkWorker(idx);
+      const wAddr=worker.addr.toString();
+      let wUtxos;
+      try{const r=await rpc.getUtxosByAddresses([wAddr]);wUtxos=r.entries;}catch(_){wUtxos=[];}
+      if(!wUtxos||!wUtxos.length){continue;}
+      let sum=0n;for(const u of wUtxos)sum+=u.amount;
+      if(sum<=100000n){log('Worker '+idx+' has dust ('+sum+' sompi), skipping');continue;}
+      log('Worker '+idx+' ('+wAddr.slice(0,24)+'…): '+wUtxos.length+' UTXO(s), '+(Number(sum)/1e8).toFixed(4)+' KAS');
+      showStatus('Sweeping worker '+idx+' ('+(Number(sum)/1e8).toFixed(2)+' KAS)…');
+      try{
+        const r=await submitTx(wUtxos,[],50000n,mainAddr,rpc,worker.pk,null);
+        log('Worker '+idx+' swept · tx '+r.txId.slice(0,12)+' · '+(Number(sum)/1e8).toFixed(4)+' KAS → main');
+        totalRecovered+=sum;txsSubmitted++;
+      }catch(se){log('Worker '+idx+' sweep failed: '+String(se).slice(0,150));}
+    }
+    if(txsSubmitted===0){toast('No leftover worker funds found.',false);showStatus('No worker funds to recover.');}
+    else{
+      toast('Recovered ~'+(Number(totalRecovered)/1e8).toFixed(2)+' KAS in '+txsSubmitted+' sweep(s). Refresh balance in ~5s.',false);
+      showStatus('Recovered '+(Number(totalRecovered)/1e8).toFixed(4)+' KAS · '+txsSubmitted+' tx');
+      setTimeout(()=>{try{refreshBalance();}catch(_){}},5000);
+    }
+  }catch(e){log('Worker recovery error: '+String(e));toast('Recovery error: '+String(e).slice(0,80),true);}
 };
 
 function showStatus(msg){$('status-bar').textContent=msg;$('status-bar').classList.add('show');setTimeout(()=>$('status-bar').classList.remove('show'),6000);}
@@ -884,7 +1880,7 @@ connect();
 </script>
 <script>
 /* === v12 UX HELPERS — engine untouched === */
-window.toast=function(msg,isErr){
+function toast(msg,isErr){
   var box=document.getElementById('toast-box');
   var t=document.createElement('div');
   t.className='toast'+(isErr?' err':'');
@@ -916,6 +1912,7 @@ window.copyAddr=function(btn){
 };
 window.copyKey=function(btn){
   navigator.clipboard.writeText(document.getElementById('wk-val').textContent);
+  setTimeout(function(){navigator.clipboard.writeText(' ').catch(function(){});},30000);
   var orig=btn.textContent;btn.textContent='Copied!';btn.style.color='var(--kas)';
   setTimeout(function(){btn.textContent=orig;btn.style.color='';},1500);
 };
@@ -967,14 +1964,6 @@ document.addEventListener('keydown',function(e){
   window.addEventListener('resize',function(){resize();mk();});
   new MutationObserver(function(){running=!ls.classList.contains('hidden');if(running){resize();mk();}}).observe(ls,{attributes:true,attributeFilter:['class']});
 })();
-/* Custom cursor (KasRanks DNA) */
-(function(){var d=document.getElementById('cur'),r=document.getElementById('cur-r');if(!d||!r||window.innerWidth<768)return;var mx=0,my=0,rx=0,ry=0;
-document.addEventListener('mousemove',function(e){mx=e.clientX;my=e.clientY;d.style.left=mx+'px';d.style.top=my+'px';});
-(function loop(){rx+=(mx-rx)*.12;ry+=(my-ry)*.12;r.style.left=rx+'px';r.style.top=ry+'px';requestAnimationFrame(loop)})();
-document.querySelectorAll('a,button,.tab,.cat-btn,.entry-card,.add-btn,.lock-btn,.copy-btn,.m-save,.m-cancel').forEach(function(el){el.addEventListener('mouseenter',function(){r.style.width='48px';r.style.height='48px';r.style.borderColor='rgba(73,234,203,.6)';});el.addEventListener('mouseleave',function(){r.style.width='32px';r.style.height='32px';r.style.borderColor='rgba(73,234,203,.35)';});});
-})();
-/* Scroll reveal */
-var obs=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting)e.target.classList.add('vis')})},{threshold:.12});document.querySelectorAll('.rv').forEach(function(el){obs.observe(el)});
 </script>
 </body>
 </html>

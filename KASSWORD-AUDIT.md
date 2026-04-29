@@ -1,7 +1,7 @@
-# Kassword — Security Audit
-**Version:** v1 (kw-1 protocol)
+# Kassword - Security Audit
+**Version:** v3 (kw-2 protocol with on-DAG media vault)
 **Date:** April 2026
-**Audited by:** KasRanks
+**Audited by:** KasRanks + multi-session cross-AI audit
 
 ---
 
@@ -10,192 +10,215 @@
 ### Key Derivation
 - **Algorithm:** PBKDF2-SHA256
 - **Iterations:** 1,000,000
-- **Salt:** 32 bytes, cryptographically random, unique per vault, stored in localStorage and embedded in DAG payload
+- **Salt:** 32 bytes, cryptographically random, unique per vault
 - **Input:** `password + '::' + walletPrivateKey (256-bit random hex)`
 - **Output:** 256-bit AES-GCM key
+- **extractable:** `false` on both `importKey` and `deriveKey`
 
 ### 2-Factor Design
-The encryption key is derived from two independent secrets:
-1. The user's master password (human-chosen)
-2. A 256-bit random wallet private key (machine-generated)
+Neither factor alone can decrypt. Brute force space: `password_space × 2^256`.
 
-Neither factor alone can decrypt the vault. An attacker who obtains the encrypted payload from the blockchain still faces a brute force space of `password_space × 2^256` — computationally impossible regardless of password strength.
+### Text Encryption (`encrypt` / `decrypt`)
+- AES-256-GCM, 12-byte random IV per call, hex output
 
-### Encryption
-- **Algorithm:** AES-256-GCM
-- **IV:** 12 bytes, cryptographically random, unique per encryption operation
-- **Authentication:** GCM provides authenticated encryption — tampered ciphertext is rejected before decryption
-- **Implementation:** Web Crypto API (browser-native, hardware-accelerated, not a JS reimplementation)
+### Binary Encryption (`encryptBytes` / `decryptBytes`)
+- AES-256-GCM, 12-byte random IV per call, ArrayBuffer I/O
+- Same `deriveKey()`, same 2-factor input, same PBKDF2-1M
+- Used for media files before they're chunked into the DAG
 
 ### Verdict: STRONG ✅
-The cryptographic design is sound. The 2-factor key derivation is the primary security innovation and it works correctly.
 
 ---
 
 ## 2. On-Chain Payload
 
-### Structure
+### kw-1 (text-only vault)
 ```json
-{
-  "t": "kw-1",
-  "v": 2,
-  "d": "<AES-256-GCM ciphertext, hex>",
-  "s": "<32-byte salt, hex>"
-}
+{"t":"kw-1","v":2,"d":"<ciphertext>","s":"<salt-64-hex>"}
 ```
 
-### What an attacker sees on the explorer
-- Ciphertext blob (unreadable without both keys)
-- Salt (needed for key derivation — not a secret, standard practice)
-- Protocol identifier `kw-1`
-- Version `2`
+### kw-2 (text + media vault)
+```json
+{"t":"kw-2","v":2,"d":"<ciphertext>","s":"<salt-64-hex>","media":[{"id":"<entry-id>","idx":"<index-tx-id>"}]}
+```
 
-### What an attacker cannot derive
-- Master password
-- Wallet private key
-- Any plaintext content
+### kw-2i (per-file index transaction)
+```json
+{"t":"kw-2i","id":"<entry-id>","txs":["<chunk-txid>",...]}
+```
+
+- Salt validated as 64-char hex on recovery before storing
+- Invalid payloads rejected entirely
+- **Manifest TXs without the protocol's maker-fee output are rejected** during scan/recovery - same defence pattern as a marketplace fake-listing filter, prevents free-rider abuse
 
 ### Verdict: SAFE ✅
-The on-chain data leaks no sensitive information. The salt being public is by design and does not weaken security when PBKDF2 iterations are high and a 256-bit second factor is required.
 
 ---
 
 ## 3. Browser Storage
 
-### What is stored in localStorage
-| Key | Content | Sensitivity |
+| Location | Content | Sensitivity |
 |---|---|---|
-| `kassword_pk` | 256-bit wallet private key (hex) | **HIGH** — second encryption factor |
-| `kassword_data` | AES-256-GCM ciphertext | Medium — unreadable without both keys |
-| `kassword_salt` | 32-byte salt (hex) | Low — public in DAG payload anyway |
+| localStorage `kassword_pk` | Wallet private key (hex) | HIGH |
+| localStorage `kassword_data` | Encrypted vault (hex) | Medium |
+| localStorage `kassword_salt` | Salt (hex) | Low |
+| IndexedDB `kassword_media/files` | AES-256-GCM ciphertext (binary) | Low - encrypted |
 
-### Risk
-localStorage is readable by:
-- Malicious browser extensions
-- XSS attacks (if hosted on a server with injected scripts)
-- Anyone with physical access to an unlocked machine
+Decrypted bytes never persist - memory only → blob URL → revoked on lock or modal close.
 
-### Mitigation
-- `kassword_data` alone is useless without the master password
-- `kassword_pk` alone is useless without the master password
-- Both together still require brute-forcing the password — but with only the wallet key factor active, a weak password becomes the bottleneck
-- **Recommendation to users:** use a clean browser profile with no third-party extensions
-
-### Verdict: ACCEPTABLE for a browser-based vault ⚠️
-This is the same threat model as every browser-based password manager (Bitwarden web, 1Password web, etc.). The 2-factor design mitigates but does not eliminate the risk of localStorage exposure.
+### Verdict: ACCEPTABLE ⚠️ (private key + Web Crypto in browser is the standard threat model)
 
 ---
 
-## 4. Input Handling & DOM Security
+## 4. DOM Security
 
-### Implemented
-- All password and sensitive inputs: `autocomplete="off"`, `autocapitalize="none"`, `autocorrect="off"`, `spellcheck="false"` — browser/keyboard will not cache or suggest sensitive data
-- `log()` and `dlog()` functions use `createElement` + `textContent` — no innerHTML with user data in debug output
-- Entry IDs validated with UUID regex before DOM use
-- Entry card onclick uses `esc()` sanitization on IDs
-
-### Not implemented
-- CSP (Content Security Policy) — intentionally excluded. The Kaspa WASM SDK requires JavaScript execution capabilities that CSP's `default-src` blocks, causing `createTransactions()` to silently fail. Adding CSP without deep SDK modification is not viable.
-
-### Verdict: GOOD ✅
-The remaining innerHTML usage (`renderVault`, `viewEntry`) operates on vault data that has already been decrypted and parsed — not on raw user input or network responses. XSS via these paths requires first decrypting the vault, which requires both keys.
-
----
-
-## 5. Network & Headers
-
-### Implemented
-- `Referrer-Policy: no-referrer` — no URL leakage to third parties
-- `Permissions-Policy` — disables camera, microphone, geolocation, USB, display capture, and other sensitive browser APIs
-- `X-Content-Type-Options: nosniff` — prevents MIME type sniffing
-- Anti-iframe script — `window.top !== window.self` check prevents clickjacking
-- Fonts loaded with `crossorigin` attribute for proper CORS isolation
-
-### External requests made by the app
-| Destination | Purpose | Risk |
-|---|---|---|
-| `fonts.googleapis.com` | UI fonts | Low — no sensitive data sent |
-| `fonts.gstatic.com` | Font files | Low — no sensitive data sent |
-| `api.kaspa.org` | DAG recovery (REST) | Low — only queries public blockchain data |
-| Kaspa resolver / `ws://127.0.0.1:16110` | RPC connection for TX | Low — standard Kaspa network |
+- `esc()` HTML-escaping on every user-controlled value rendered to DOM
+- UUID regex validation on entry IDs before any operation
+- `createElement` + `textContent` in log functions - no `innerHTML` paths from user input
+- Recovery debug log writes to DOM only, never to `console.log`
+- Centralized `[KW]` logger; no debug dumps in production paths
+- Anti-clickjacking: top-frame redirect on iframe embed
+- `Permissions-Policy` and `X-Content-Type-Options` headers set
 
 ### Verdict: GOOD ✅
 
 ---
 
-## 6. Session Security
+## 5. Session Security
 
-### Auto-lock
-- Triggers after **5 minutes** of inactivity (no mouse, keyboard, or click events)
-- On lock: `masterPass = null`, vault array cleared, all cached decrypted data wiped from memory
-- Password input fields cleared on lock
-
-### Brute Force Protection
-- **5 failed attempts** → 30-second cooldown
-- Pattern detection: all-same-character passwords (`00000000`, `aaaaaaaa`) are rejected
-- Minimum password length: 8 characters (12+ recommended)
-- Password strength meter with real-time feedback
+- Auto-lock: 5 minutes inactivity
+- On lock: `masterPass=null`, `vault=[]`, `privateKey=null`, `address=null`, `cpData={}`, all blob URLs revoked, all modals closed
+- `beforeunload`: same cleanup on tab close
+- Brute force: 5 attempts → 30s cooldown
+- Password strength meter with weak-pattern detection (all-same-char, sequential digits, common prefixes)
+- Recovery snapshot: prior `kassword_pk` / `kassword_salt` saved before recovery overwrites; restored if decrypt fails
 
 ### Verdict: STRONG ✅
 
 ---
 
-## 7. Supply Chain
+## 6. Backup Integrity
 
-### Dependencies
-- **Kaspa WASM SDK** (`kaspa.js` + `kaspa_bg.wasm`) — bundled locally in the repository. No CDN. No remote fetch at load time. The exact files are locked to the repo.
-- **Google Fonts** — loaded from Google's CDN. Fonts are presentation-only; compromise of this CDN cannot affect cryptographic operations or vault data.
-- **No npm, no webpack, no build pipeline** — single HTML file, zero external JS dependencies beyond the bundled WASM SDK.
+- Pre-flight deep-scan: walks every prior kw-2 manifest before backup, restores any missing dagIdx into local vault, guarantees the new manifest references **every** media entry that's ever been backed up
+- Hard-abort on unrecoverable entries: if any media has no DAG ref AND no IDB bytes, the backup refuses to proceed and lists the offending entries
+- All TX submissions use `allowOrphan: false`
+- Single-output pre-split avoids KIP-9 storage-mass dust trap (10^12/output_amount mass cap)
+- Backup duplicate-click guard: button disables while in flight to prevent mempool TX collisions
+- Manifest TX uses depth-1 reserved UTXO (auto-change from pre-split) - never competes with the deep chunk-chain
 
 ### Verdict: STRONG ✅
-The only meaningful supply chain risk is if the repository itself is compromised and the WASM SDK files are swapped. Users can verify the SDK files against the official Kaspa releases.
 
 ---
 
-## 8. What Cannot Be Attacked From the Chain
+## 7. Media Vault & Chunked DAG Backup
 
-| Attack | Possible? | Reason |
-|---|---|---|
-| Decrypt vault from payload alone | ❌ No | Requires master password + wallet key |
-| Brute force password from payload | ❌ No | 2^256 wallet key factor makes it impossible |
-| Reverse-engineer vault structure | ❌ No | AES-GCM ciphertext is indistinguishable from random |
-| Identify protocol from payload | ✅ Yes | `"t":"kw-1"` is visible — by design, not a risk |
-| Rainbow table attack | ❌ No | Random 32-byte salt + 1M PBKDF2 iterations eliminates this |
-| Replay attack | ❌ No | Recovery requires decryption, not just payload presence |
+### Encryption (unchanged from text path)
+- Same AES-256-GCM + PBKDF2-1M + 2-factor as text entries
+- Fresh 12-byte IV per `encryptBytes()` call
+- 3 MB per file, 15 MB total enforced before encryption
+- MIME whitelist: PNG, JPG, GIF, WebP, MP4, WebM, MP3, WAV, OGG
+
+### Chunking & Upload
+- 10 KB raw payload per chunk transaction
+- Up to 6 ephemeral worker keys (derived via `SHA-256(walletKey + ':kw-chunk-worker:' + index)`)
+- Parallel chunk upload across workers, contiguous slices preserve chunk order in the index TX
+- Per-file index TX created from main wallet, listing every chunk txid in order
+- Workers sweep remainder back to main on completion
+- KIP-9 mass safety: each worker output ≥ 1 KAS keeps storage mass < 10K per output
+
+### Worker Key Security
+- Derived deterministically from main wallet key + index
+- Exists only during backup execution
+- Never persisted, never logged, never sent over network
+- Re-derivable at any time for orphan-fund recovery (Recover worker funds button)
+
+### Read Path
+- Bulk fetch via `POST /transactions/search` (up to 100 txids per request) - single round-trip per 100 chunks instead of 100 individual GETs
+- Per-chunk fallback for any chunk the bulk endpoint missed (4-attempt retry, 15s timeout, 429/503-aware)
+- Foreground viewer pauses background prefetch to claim full bandwidth
+- Decrypted bytes: in-memory ArrayBuffer → Blob → tracked blob URL → revoked on lock or modal close
+
+### Verdict: STRONG ✅
 
 ---
 
-## 9. Remaining Risks (Honest Assessment)
+## 8. Cross-Browser Recovery
+
+- Walks wallet TX history (paginated, 50/page, max 5,000 TXs)
+- Decodes payloads, validates salt, decrypts vault with provided key + password
+- Restores vault entries, then resolves dagIdx for each media entry by:
+  1. Reading inline `mf.txs` (kw-2 v1 legacy) OR
+  2. Bulk-fetching index TXs by `mf.idx` (kw-2 v2)
+- Deep-scan fallback: any media still missing dagIdx after the latest manifest → walks older manifests in TX history (early-exit when all targets resolved)
+- Manifests without the protocol's maker fee are rejected - same enforcement as backup time
+
+### Verdict: STRONG ✅
+
+---
+
+## 9. Supply Chain
+
+- WASM SDK bundled locally, no CDN
+- No npm, no build pipeline, no transpiler
+- Single HTML file, ~120 KB
+- Web Crypto, IndexedDB, fetch - all browser-native
+
+### Verdict: STRONG ✅
+
+---
+
+## 10. Resolved Findings
+
+| ID | Severity | Finding | Status |
+|---|---|---|---|
+| V-08 | CRITICAL | Silent backup failure - user pays, vault not saved | FIXED - Path B removed |
+| C-2 | CRITICAL | `console.log` dumps recovery debug data | FIXED - removed |
+| C-3 | CRITICAL | `saveEntry` rebuilt entry from form fields, silently dropped `dagChunks` / `dagIdx` on edit | FIXED - spreads existing entry first, form fields overlay |
+| C-4 | CRITICAL | Backup silently dropped media with missing local bytes from chunkManifest, leaving partial manifests | FIXED - hard-abort with clear error listing affected entries |
+| H-1 | HIGH | No `beforeunload` - secrets survive tab close | FIXED - handler added |
+| H-2 | HIGH | Recovery accepts unvalidated payloads | FIXED - salt validated, fee verified |
+| H-3 | HIGH | Password field not cleared on abandon | FIXED - cleared on lock |
+| H-4 | HIGH | Pre-split with two explicit outputs left a dust change → KIP-9 mass overflow | FIXED - single explicit output, change auto-flows to main |
+| H-5 | HIGH | Manifest TX could fail at depth 192+ in the chunk virtual-UTXO chain | FIXED - manifest uses depth-1 reserved UTXO from pre-split |
+| H-6 | HIGH | `chunkManifest` overwrite bug in fresh-upload path silently dropped media references | FIXED - push() instead of index assignment |
+| M-1 | MEDIUM | `isMedia` detection only checked IDB cache → text-tier backup after cache clear | FIXED - also checks dagIdx / dagChunks |
+| M-2 | MEDIUM | Free-rider risk: anyone could craft a kw-2 payload TX without paying maker fee and have it surface in recovery | FIXED - manifest fee verification on every kw scan candidate |
+| M-3 | MEDIUM | Sequential chunk fetcher → api.kaspa.org rate-limit storms | FIXED - bulk endpoint primary, per-chunk fallback only |
+| M-4 | MEDIUM | Backup duplicate-click could trigger mempool TX collision | FIXED - in-flight guard disables button |
+
+---
+
+## 11. Remaining Risks
 
 | Risk | Severity | Mitigation |
 |---|---|---|
-| Malicious browser extension reads localStorage | HIGH | User education — clean profile, no extensions |
-| Keylogger on OS captures master password | HIGH | OS-level — no browser app can prevent this |
-| XSS if hosted on compromised server | MEDIUM | Use locally; if hosted, serve over HTTPS only |
-| Weak master password if localStorage stolen | MEDIUM | Password strength enforced + 2-factor design |
-| Physical access to unlocked machine | MEDIUM | Auto-lock after 5 minutes |
-| Google Fonts CDN compromise | LOW | Fonts only — no access to crypto or vault data |
+| Malicious browser extension reads localStorage | HIGH | Clean browser profile, never run on shared machines |
+| OS-level keylogger | HIGH | Out of scope for browser apps |
+| Compromised host file injection | MEDIUM | Run locally, integrity-check the HTML before launch |
+| Weak password if localStorage stolen | MEDIUM | 2-factor + strength enforcement |
+| Physical access to unlocked machine | MEDIUM | Auto-lock 5 min |
+| api.kaspa.org indexer downtime | LOW | Bulk + per-chunk fallback; user can retry, run a local archival node, or use mirror endpoints |
+| Future quantum attacks on secp256k1 wallet signing | LOW | AES-256 already quantum-safe (symmetric); migrate when KIP-22 P2MR ships post-Toccata |
 
 ---
 
-## 10. Final Verdict
+## 12. Final Verdict
 
-| Category | Score | Notes |
-|---|---|---|
-| Cryptographic design | 10/10 | AES-256-GCM + PBKDF2-1M + 2-factor is excellent |
-| On-chain payload security | 10/10 | Zero sensitive data exposed |
-| Input sanitization | 8/10 | autocomplete/spellcheck hardened; no CSP (WASM limitation) |
-| Session security | 9/10 | Auto-lock, brute force protection, memory clearing |
-| Supply chain | 9/10 | Fully bundled, no CDN for critical assets |
-| Browser storage model | 6/10 | localStorage is the inherent weakness of all web vaults |
-| **Overall** | **8.5/10** | **Production-ready for public launch** |
+| Category | Score |
+|---|---|
+| Cryptographic design | 10/10 |
+| On-chain payload security | 10/10 |
+| Session security | 10/10 |
+| Backup integrity | 10/10 |
+| Media vault security | 10/10 |
+| Cross-browser recovery | 10/10 |
+| Input sanitization | 9/10 |
+| Supply chain | 9/10 |
+| Browser storage model | 6/10 |
+| **Overall** | **9/10 - Production-ready** |
 
-### Summary
-
-Kassword's cryptographic foundation is strong. The 2-factor key derivation design means the on-chain payload is permanently unreadable without both independent secrets. The remaining risks are inherent to the browser environment and are shared by every web-based password manager in existence. Users who follow the security best practices (clean browser profile, no extensions, strong password, save vault key offline) have a security posture that is genuinely difficult to attack.
-
-**Ready for public launch. ✅**
+The `9/10` ceiling reflects browser storage as the second factor (private key in localStorage). This is the same trade-off every browser-side wallet makes; mitigated by the 2-factor design where the password is also required, and by user-side practices (clean profile, offline backup of vault key).
 
 ---
 
-*Audit reflects the current codebase as of the kw-1 protocol release.*
+*Audit reflects kw-2 v2 codebase with on-DAG media vault, parallel chunk pipeline, fee verification, and multi-manifest recovery. April 2026.*
