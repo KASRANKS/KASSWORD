@@ -1,0 +1,19 @@
+{
+  "name": "Kassword",
+  "short_name": "Kassword",
+  "version": "2026-06-30-r18",
+  "description": "Post-quantum password vault + Kaspa Locker. Encrypted with Argon2id + XChaCha20-Poly1305 + ML-KEM-1024 + ML-DSA-87. Optional cold-device air-gap arming for 3-factor security.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#061118",
+  "theme_color": "#49eacb",
+  "categories": ["security", "utilities", "productivity"],
+  "icons": [
+    { "src": "icons/kw-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/kw-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/kw-192-maskable.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "icons/kw-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
