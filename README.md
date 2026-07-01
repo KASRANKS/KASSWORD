@@ -1,136 +1,72 @@
 # Kassword
 
-**Your passwords on Kaspa.** AES-256 encrypted. Backed up to the Kaspa BlockDAG. No servers. No accounts. No subscriptions. You own your data.
+A post-quantum password vault and an on-chain covenant wallet for Kaspa, in one HTML file. No backend, no accounts, no telemetry. Everything is encrypted in your browser and stays there, unless you choose to write an encrypted backup to the Kaspa BlockDAG.
 
-## What is Kassword?
+## What it is
 
-Kassword is a personal password and media vault that runs entirely in your browser. Your secrets - passwords, seed phrases, identity documents, secure notes, images, video, audio - are encrypted with AES-256-GCM and backed up as transaction payloads on the Kaspa BlockDAG. Recoverable from any device, any browser, forever.
+One sealed page, two things:
 
-No server ever sees your data. No account to hack. No subscription to cancel. Your vault lives in your browser and in the DAG - nowhere else.
+**A vault.** Passwords, logins, notes, cards, IDs, wallet backups, small files. Encrypted at rest with Argon2id key stretching, XChaCha20-Poly1305, and a post-quantum ML-KEM-1024 + ML-DSA-87 envelope. There is no server to store any of it, because there is no server.
 
-## Security Model
+**Kaspa Locker.** Lock KAS in an on-chain vault whose spending rules are enforced by Kaspa consensus, not by us. You arm any mix of six unlock branches:
 
-- **AES-256-GCM** - authenticated encryption, same standard used by governments and militaries
-- **PBKDF2 1,000,000 iterations** - makes brute force computationally non-viable
-- **2-factor encryption** - your data is encrypted using BOTH your master password AND a random 256-bit wallet key. Neither alone is sufficient. Even a weak password is uncrackable without the 64-char wallet key
-- **Random salt + random IV** - per vault and per encryption operation. Two users with the same password produce completely different ciphertext
-- **Zero servers** - no accounts, no cloud, no third parties, no telemetry
-- **Web Crypto API** - browser-native, hardware-accelerated cryptography
-- **Kaspa WASM SDK bundled locally** - no CDN, no supply chain risk
-- **Anti-clickjacking** - cannot be embedded in iframes
-- **Auto-lock** - vault locks after 5 minutes of inactivity, clearing all secrets from memory
-- **Tab close protection** - secrets wiped immediately on browser tab close
-- **Derived chunk-worker keys** - media uploads sign from ephemeral SHA-256-derived keys, not the main wallet key. Re-derivable, never stored
+- **Schnorr** open with this wallet (optional master-password 2-factor)
+- **HLMT / PQ** quantum-resistant cold key
+- **HTLC** digital escrow / cash drop: the recipient claims by revealing a secret you hand them out-of-band
+- **DMS** dead-man switch / inheritance: an heir can claim after you go silent past a time-lock
+- **Recovery** an M-of-N trustee quorum, after a time-lock
+- **PQ-cold** sig-less, with the payout fixed by consensus
 
-## What You Can Store
+For every keyless branch the payout address and amount are pinned inside the redeem script, so the network itself guarantees the funds can only go where you set them. There is no Kassword server. By default the app reaches Kaspa through public nodes and the public REST API (api.kaspa.org, *.kaspa.stream); you can point it at your own local node instead. Your keys and vault never leave the browser either way.
 
-- **Passwords** - username, password, website URL
-- **Secure notes** - freeform encrypted text
-- **Recovery records** - crypto wallet recovery phrases, security keys
-- **Identity documents** - passport numbers, driver licenses, etc.
-- **Media files** - images (PNG, JPG, GIF, WebP), video (MP4, WebM), audio (MP3, WAV, OGG). Max 3 MB per file, 15 MB total. Encrypted with the same AES-256-GCM scheme and chunked into the DAG.
+## Crypto
 
-## How It Works
+- Argon2id (RFC 9106) master-password stretch, 64 MiB, 3 iterations
+- XChaCha20-Poly1305 vault encryption
+- ML-KEM-1024 (FIPS-203, NIST Level 5) key encapsulation
+- ML-DSA-87 (FIPS-204, NIST Level 5) signatures
+- BLAKE2b Merkle trees for the cold-key covenants
+- CSP with the inline module pinned by SHA-256; the Kaspa WASM signer pinned by SHA-384 and re-verified on every load, hard-halt on mismatch
 
-1. **Set a master password** - 8+ characters. There is no recovery. Choose carefully.
-2. **Save your vault key** - the 64-character hex key shown under "Show vault key". You need BOTH this key AND your password to recover. Store it somewhere safe - offline, printed, separate from your password.
-3. **Add entries** - passwords, recovery records, IDs, secure notes, or media files.
-4. **Fund your wallet** - send at least 5 KAS (10 KAS if you have media files) to your vault address.
-5. **Backup to DAG** - your encrypted vault is stored as a transaction payload. Permanent. Indestructible. Unreadable without both your keys.
-6. **Recover anywhere** - new device? Click "Recover from DAG backup", enter your vault key + password. Your secrets come back from the DAG, including media files.
+## Running it
 
-## Media Vault - On-DAG Encrypted Backup
+It is a PWA, so serve it over http. A service worker and ES modules do not run from a `file://` path.
 
-Media files are encrypted with AES-256-GCM (the same 2-factor scheme as text entries) and chunked into Kaspa transaction payloads. The encrypted bytes hit the DAG already-encrypted - only your password + wallet key can decrypt.
+- Windows: double-click `start.bat` (needs Python 3).
+- Any OS: `python serve_nocache.py`, then open the localhost URL it prints.
+- Or drop the folder behind any static host.
 
-| Limit | Value |
-|---|---|
-| Max per file | 3 MB |
-| Max total media | 15 MB |
-| Images | PNG, JPG, GIF, WebP |
-| Video | MP4, WebM |
-| Audio | MP3, WAV, OGG |
-| Chunk size | 10 KB raw payload per TX |
+Install it from the browser to keep an offline copy. A cold device can then reopen it in airplane mode.
 
-A 1.8 MB video splits into ~190 chunks. Up to 6 ephemeral worker keys (derived via SHA-256 from your wallet key) upload chunks in parallel, then sweep their remainder back to your main wallet. Total backup time for a typical 1.8 MB file: ~5 seconds.
+`mainnet/` targets Kaspa mainnet. `testnet/` is the same app built for testnet-10, for trying things out. They share the same covenant and crypto code and differ in the network they connect to, the addresses they use, and the endpoints they allow.
 
-Each media entry is referenced in the manifest by an INDEX TX (kw-2 v2 protocol) - a single transaction whose payload lists every chunk txid for that file. Recovery fetches the manifest, the index TXs, then chunks via the bulk-search endpoint.
+## Tested on mainnet
 
-### Recovery & Refresh Tools
+This build was run on Kaspa mainnet, not only locally:
 
-The wallet bar exposes three on-demand tools for healing local state without re-uploading:
+- Send, send-all, and every vault style deployed and unlocked on mainnet.
+- Escrow claimed by a separate recipient wallet with the REST API switched off (node RPC only), to prove the vault needs no third-party service.
+- Inheritance claimed by a separate heir wallet after the time-lock, with no key of the owner's.
+- A full two-device cold/hot air-gap cycle: the offline device signs, the online device broadcasts, the signing key never goes online.
+- An encrypted vault written to the BlockDAG and recovered on a fresh device.
 
-- **Recover worker funds** - re-derive the chunk-worker keys (indices 0–5) and sweep any leftover funds back to your main wallet
-- **Re-link DAG videos** - walk every prior manifest in your wallet's TX history and restore any missing media references (fixes "no media data available" without spending KAS)
-- **↻ Refresh media** - re-fetch chunks for any media not yet in the local cache
+Then the covenants were attacked. Against real vaults deployed on mainnet, 18 hostile spends were fired across the escrow, inheritance, M-of-N and cold-pin branches: wrong preimage, wrong signer, preimage replay, payout redirect, extra-output siphon, fee-burn, short quorum, duplicate signer, out-of-order signatures, forged leaf signatures. Kaspa consensus rejected all 18. Only the legitimate spends were accepted, and every principal came back. The redeem-script logic was reviewed line by line on top of that.
 
-If a single video gets stuck loading, every video viewer also has a built-in **↻ Retry** button that re-runs the fetch without closing the modal.
+## Notes before you trust it with anything
 
-## Backup Fees
+- The master password is a real access gate, not just local encryption. Without it the vault and the UI-gated wallet features stay closed.
+- Back up your vault key. An imported wallet is recoverable only from its key plus the password.
+- Writing an encrypted backup to the BlockDAG is an on-chain transaction: it carries a protocol fee (a few KAS) on top of the normal network fee, and the exact total is shown before you sign. Opening the app, using the vault, locking and unlocking, and sending KAS cost only the normal network fee.
+- It is one static file plus the pinned Kaspa WASM SDK. Read it. Host it yourself if you prefer.
 
-| Backup type | Maker (KasRanks) | Miners | Total |
-|---|---|---|---|
-| Text-only vault (kw-1) | 2 KAS | 3 KAS | **5 KAS** |
-| Media vault (kw-2)     | 4 KAS | 6 KAS | **10 KAS** |
+## Contents
 
-Plus negligible per-chunk transaction fees (~50,000 sompi each, ~0.1 KAS for a 1.8 MB file).
+- `index.html` the whole app
+- `sw.js`, `manifest.json` PWA shell
+- `kw-pq.js` post-quantum module
+- `kaspa/` the Kaspa WASM SDK, from kaspanet/rusty-kaspa (ISC), vendored so the app runs fully offline
+- `icons/`, `serve_nocache.py`, `start.bat` icons and a local no-cache server
 
-## Running Locally
+## License
 
-**Windows:** Double-click `start.bat`
-
-**Mac/Linux:**
-```bash
-cd kassword
-python3 -m http.server 7777
-# Open http://localhost:7777
-```
-
-Kassword is designed to run locally. Running at `localhost:7777` eliminates network-based injection risks. Do not use on shared or untrusted computers.
-
-## What Kassword Guarantees
-
-- Data at rest is AES-256-GCM encrypted at all times
-- Encryption key requires both password AND wallet key - neither alone works
-- DAG backups are permanently unreadable without both factors
-- Media files encrypted with the same scheme as text entries - including before they ever touch the DAG
-- No server, no account, no cloud, no third party ever touches your data
-- Tampered ciphertext is rejected (authenticated encryption)
-- Auto-lock wipes sensitive data from memory after inactivity
-- Tab close wipes all secrets immediately
-- Decrypted media blob URLs revoked on lock and tab close
-- Manifest TXs without the protocol fee are filtered from recovery - protocol enforcement
-- Open source - no hidden backdoors, verify it yourself
-
-## What Kassword Does NOT Guarantee
-
-- Protection against malicious browser extensions - extensions can read browser storage. **Use a clean browser profile with no third-party extensions.**
-- Protection against a compromised OS - keyloggers and malware operate below the browser layer. No password manager can defend against this.
-- Password recovery - by design. No backdoor exists. If you lose both your master password and your vault key, your data is gone.
-- Wallet key recovery - your wallet private key is stored in localStorage as the second encryption factor. If you lose both your browser localStorage and your saved vault key copy, recovery is impossible.
-
-## Security Best Practices
-
-- Use a dedicated browser profile with no extensions when accessing your vault
-- Never use on a shared or public computer
-- Store your vault key offline (written down, printed) - separate from your password
-- Back up to the DAG before clearing browser data or switching browsers
-- Fund your vault wallet with only what you need for backups (~10 KAS for media-tier backups)
-- Use a strong master password - 12+ characters, mixed types
-
-## Tech Stack
-
-- Vanilla HTML/CSS/JS - single file, no build step, no dependencies, no framework
-- Kaspa WASM SDK - bundled locally, no CDN, no external requests
-- Web Crypto API - native browser cryptography, hardware-accelerated
-- IndexedDB - browser-native binary storage for encrypted media files
-- Kaspa REST bulk-search endpoint - single POST per 100 chunks, rate-limit friendly
-- Google Fonts (Syne, Outfit, JetBrains Mono)
-
-## Built by KasRanks
-
-Part of the [KasRanks](https://x.com/Kas_Ranks) ecosystem - tools and culture for Kaspa.
-
----
-
-*Your passwords. Your media. Your keys. Your DAG.*
+TBD by the author. Provided as-is. You are responsible for your own keys, passwords, and funds. This is not financial advice.
