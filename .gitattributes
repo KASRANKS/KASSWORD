@@ -1,0 +1,11 @@
+# Byte-exact preservation. The inline application module is pinned by a CSP
+# sha256 hash; kw-pq.js is pinned by native Subresource Integrity, and the
+# Kaspa SDK files are pinned by SHA-384 checks in the app and service worker.
+# Those hashes are computed over the raw file bytes, so ANY line-ending
+# conversion (LF <-> CRLF) on clone/checkout would change the bytes and break
+# the sealed page. Treat the hashed assets as binary — never convert them.
+*.html  -text
+*.js    -text
+*.mjs   -text
+*.wasm  -text
+*.json  -text
